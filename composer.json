@@ -1,0 +1,20 @@
+{
+    "name": "rsilva/user-onboarding",
+    "description": "Onboarding module by https://github.com/SilRodrigo for Magento 2",
+    "require": {
+        "php": ">=8.1",
+        "rsilva/base": ">=1.0.0",
+    },
+    "type": "magento2-module",
+    "license": [
+        "MIT"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Rsilva\\UserOnboarding\\": ""
+        }
+    }
+}

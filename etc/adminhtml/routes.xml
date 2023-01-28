@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+/**
+  * @author Rodrigo Silva
+ * @copyright Copyright (c) 2022 Rodrigo Silva (https://github.com/SilRodrigo)
+ * @package Rsilva_Vitrine
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
+    <router id="admin">
+        <route id="rsilva_user_onboarding" frontName="rsilva_user_onboarding">
+            <module name="Rsilva_UserOnboarding" before="Magento_Backend" />
+        </route>
+    </router>
+</config>

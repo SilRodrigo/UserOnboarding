@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+  * @author Rodrigo Silva
+ * @copyright Copyright (c) 2022 Rodrigo Silva (https://github.com/SilRodrigo)
+ * @package Rsilva_Base
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+  <argument name="data" xsi:type="array">
+    <item name="js_config" xsi:type="array">
+      <item name="provider" xsi:type="string">user_onboarding_grid.user_onboarding_grid_data_source</item>
+    </item>
+  </argument>
+  <settings>
+    <buttons>
+      <button name="create">
+        <url path="*/*/create"/>
+        <class>primary</class>
+        <label translate="true">Create Onboarding</label>
+      </button>
+    </buttons>
+    <spinner>onboarding_columns</spinner>
+    <deps>
+      <dep>user_onboarding_grid.user_onboarding_grid_data_source</dep>
+    </deps>
+  </settings>
+
+  <dataSource name="user_onboarding_grid_data_source">
+    <argument name="dataProvider" xsi:type="configurableObject">
+      <argument name="class" xsi:type="string">Rsilva\UserOnboarding\Ui\DataProvider\Onboarding\ListingDataProvider</argument>
+      <argument name="name" xsi:type="string">user_onboarding_grid_data_source</argument>
+      <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+      <argument name="requestFieldName" xsi:type="string">entity_id</argument>
+      <argument name="data" xsi:type="array">
+        <item name="config" xsi:type="array">
+          <item name="update_url" xsi:type="url" path="mui/index/render"/>
+          <item name="storageConfig" xsi:type="array">
+            <item name="indexField" xsi:type="string">entity_id</item>
+          </item>
+        </item>
+      </argument>
+    </argument>
+    <argument name="data" xsi:type="array">
+      <item name="js_config" xsi:type="array">
+        <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+      </item>
+    </argument>
+  </dataSource>
+
+  <columns name="onboarding_columns">
+    <argument name="data" xsi:type="array">
+      <item name="config" xsi:type="array" />
+    </argument>
+    <column name="entity_id">
+      <settings>
+        <label translate="true">Id</label>
+      </settings>
+    </column>
+    <!--  -->
+    <column name="name">
+      <settings>
+        <label translate="true">Name</label>
+      </settings>
+    </column>
+    <column name="page_url">
+      <settings>
+        <label translate="true">Page Url</label>
+      </settings>
+    </column>
+
+    <actionsColumn name="actions" class="Rsilva\UserOnboarding\Ui\Component\Onboarding\Listing\Columns\Actions">
+      <settings>
+        <indexField>entity_id</indexField>
+      </settings>
+    </actionsColumn>
+  </columns>
+</listing>

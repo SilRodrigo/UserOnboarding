@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<!--
+/**
+  * @author Rodrigo Silva
+ * @copyright Copyright (c) 2022 Rodrigo Silva (https://github.com/SilRodrigo)
+ * @package Rsilva_Vitrine
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!--  GRID  -->
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="user_onboarding_grid_data_source" xsi:type="string">OnboardingCollection</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="OnboardingCollection" type="Rsilva\UserOnboarding\Ui\DataProvider\Onboarding\Listing\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">rsilva_user_onboarding</argument>
+            <argument name="resourceModel" xsi:type="string">Rsilva\UserOnboarding\Model\ResourceModel\Onboarding</argument>
+        </arguments>
+    </virtualType>
+    <!--  /GRID  -->
+</config>

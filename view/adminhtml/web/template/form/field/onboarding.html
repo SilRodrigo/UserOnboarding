@@ -1,0 +1,38 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<div class="admin__field"
+     visible="visible"
+     css="$data.additionalClasses"
+     attr="'data-index': index">
+    <div class="admin__field-label" visible="$data.labelVisible">
+        <label if="$data.label" attr="for: uid">
+            <span translate="label" attr="'data-config-scope': $data.scopeLabel"></span>
+        </label>
+    </div>
+    <div class="admin__field-control"
+         css="'_with-tooltip': $data.tooltip, '_with-reset': $data.showFallbackReset && $data.isDifferedFromDefault">
+        <div id="iframe_container" class="pos-relative">
+            <iframe data-bind="attr: { src: iframe.url(), width: iframe.width, height: iframe.height },
+                                afterRender: setIframeScope"
+                    frameborder="0"></iframe>
+            <div class="create-action d-flex align-items-center justify-content-center">
+                <button data-bind="click: startOnboardingCreation">
+                    <span class="lpad-5" data-bind="i18n: 'Create new onboarding'"></span>
+                </button>
+            </div>
+            <div class="editing-action onboarding-menu pad-10">
+                <button id="close_creation_btn" data-bind="click: closeOnboardingCreation"></button>
+                <button id="save_creation_btn" class="lmarg-10 save primary" data-bind="i18n: 'Save'"></button>
+            </div>
+        </div>
+    </div>
+    <div class="admin__field-config pad-10 onboarding-menu">
+        <div>
+            <div class="fs-18">Created onboardings:</div>
+        </div>
+    </div>
+</div>

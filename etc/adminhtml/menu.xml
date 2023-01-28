@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+  * @author Rodrigo Silva
+ * @copyright Copyright (c) 2022 Rodrigo Silva (https://github.com/SilRodrigo)
+ * @package Rsilva_Vitrine
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Rsilva_UserOnboarding::menu"
+             title="Onboarding"
+             module="Rsilva_UserOnboarding"
+             translate="title"
+             sortOrder="1"
+             action="rsilva_user_onboarding/index"
+             parent="Rsilva_Base::menu"
+             resource="Rsilva_UserOnboarding::menu"/>
+    </menu>
+</config>
