@@ -5,53 +5,118 @@ define([
 
     /* Based on https://jsfiddle.net/1jvdacrk/2/ */
 
-    let currentlyHighlightedItem = null;
+    class highlight {
 
-    function createHighlight() {
-        let highlight = document.createElement('div');
-        highlight.id = 'highlight';
-        Object.assign(highlight.style, {
-            'position': 'absolute',
-            'background-color': 'blue',
-            'opacity': '0.4',
-            'border': '1px solid red',
-            'pointer-events': 'none',
-            'z-index': '750'
-        });
-        return highlight;
-    }
+        /**
+         * @type {HTMLElement}
+         */
+        #currentlyHighlightedItem;
 
-    /**
-     * @param {string} page Page selector to be highlighted
-     * @param {Window} scopeWindow
-     */
-    return function (page, scopeWindow = null) {
+        /**
+         * @type {HTMLDivElement}
+         */
+        #highlight;
 
-        let highlight = createHighlight();
-        if (!scopeWindow) scopeWindow = window;
+        /**
+         * @type {Window}
+         */
+        #scopeWindow;
 
-        function highlightElement(element) {
-            if (currentlyHighlightedItem == element) return;
+        /**
+         * @type {Document}
+         */
+        #page;
 
-            let rect = element.getBoundingClientRect();
-            highlight.style.left = (scopeWindow.scrollX + rect.x) + "px";
-            highlight.style.top = (scopeWindow.scrollY + rect.y) + "px";
-            highlight.style.width = rect.width + "px";
-            highlight.style.height = rect.height + "px";
+        /**
+         * @type {boolean}
+         */
+        #is_active = false;
 
-            page.appendChild(highlight);
-            currentlyHighlightedItem = element;
+        #actions = {
+            click: function () { }
+        };
+
+        /**
+         * @param {Document} page 
+         * @param {Window} scopeWindow 
+         * @param {Object} actions 
+         */
+        constructor(page, scopeWindow = null, actions = {}) {
+            this.#highlight = this.#createHighlightElement();
+            this.#page = page;
+            this.#scopeWindow = scopeWindow || window;
+
+            this.#page.addEventListener('mousemove', (e) => {
+                if (!this.#is_active) return;
+                this.#highlightElement(e.target);
+            }, true);
+            this.#page.addEventListener('mouseleave', (e) => {
+                if (!this.#is_active) return;
+                this.#highlight.remove();
+                this.#currentlyHighlightedItem = null;
+            });
+            this.#page.addEventListener('mousedown', (e) => {
+                if (!this.#is_active) return;
+                e.preventDefault();
+                this.#highlight.style.pointerEvents = 'auto';
+            });
+            this.#page.addEventListener('mouseup', (e) => {
+                if (!this.#is_active) return;
+                e.preventDefault();
+                this.#actions.click(e);
+                this.#highlight.style.pointerEvents = 'none';
+            });
+
+            for (const key in actions) {
+                this.#actions[key] = actions[key];
+            }
         }
 
-        page.addEventListener("mousemove", e => {
-            highlightElement(e.target)
-        }, true);
-        page.addEventListener('click', e => {
-            e.preventDefault();
-        });
-        page.addEventListener("mouseleave", function (e) {
-            highlight.remove();
-            currentlyHighlightedItem = null;
-        });
+        #createHighlightElement() {
+            let highlight = document.createElement('div');
+            highlight.id = 'highlight';
+            Object.assign(highlight.style, {
+                'position': 'absolute',
+                'background-color': 'blue',
+                'opacity': '0.4',
+                'border': '1px solid red',
+                'pointer-events': 'none',
+                'z-index': '750'
+            });
+            return highlight;
+        }
+
+        #highlightElement(element) {
+            if (!element || this.#currentlyHighlightedItem == element) return;
+
+            let rect = element.getBoundingClientRect();
+            this.#highlight.style.left = (this.#scopeWindow.scrollX + rect.x) + "px";
+            this.#highlight.style.top = (this.#scopeWindow.scrollY + rect.y) + "px";
+            this.#highlight.style.width = rect.width + "px";
+            this.#highlight.style.height = rect.height + "px";
+
+            this.#page.prepend(this.#highlight);
+            this.#currentlyHighlightedItem = element;
+        }
+
+        toggle() {
+            this.isActive() ? this.#is_active = false : this.#is_active = true;
+        }
+
+        start() {
+            this.#is_active = true;
+        }
+
+        stop() {
+            this.#is_active = false;
+        }
+
+        isActive() {
+            return this.#is_active;
+        }
+    }
+
+    return function (page, scopeWindow, actions) {
+        return new highlight(page, scopeWindow, actions)
     }
 });

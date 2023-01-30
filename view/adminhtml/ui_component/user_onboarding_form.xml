@@ -2,8 +2,8 @@
 <!--
 /**
   * @author Rodrigo Silva
- * @copyright Copyright (c) 2022 Rodrigo Silva (https://github.com/SilRodrigo)
- * @package Rsilva_Base
+ * @copyright Copyright (c) 2023 Rodrigo Silva (https://github.com/SilRodrigo)
+ * @package Rsilva_UserOnboarding
  */
 -->
 <form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
@@ -121,6 +121,36 @@
                <rule name="required-entry" xsi:type="boolean">true</rule>
             </validation> -->
          </settings>
+      </field>
+      <field name="wysiwyg" sortOrder="10" formElement="wysiwyg" template="Rsilva_UserOnboarding/form/field">
+         <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+               <item name="source" xsi:type="string">wysiwyg</item>
+               <item name="wysiwygConfigData" xsi:type="array">
+                  <item name="is_pagebuilder_enabled" xsi:type="boolean">false</item>
+                  <item name="toggle_button" xsi:type="boolean">true</item>
+                  <item name="height" xsi:type="string">200px</item>
+                  <item name="add_variables" xsi:type="boolean">true</item>
+                  <item name="add_widgets" xsi:type="boolean">true</item>
+                  <item name="add_images" xsi:type="boolean">true</item>
+                  <item name="add_directives" xsi:type="boolean">true</item>
+               </item>
+               <item name="visible" xsi:type="boolean">false</item>
+               <item name="labelVisible" xsi:type="boolean">false</item>
+            </item>
+         </argument>
+         <settings>
+            <label translate="true">Step</label>
+            <dataScope>wysiwyg</dataScope>
+         </settings>
+         <formElements>
+            <wysiwyg>
+               <settings>
+                  <rows>5</rows>
+                  <wysiwyg>true</wysiwyg>
+               </settings>
+            </wysiwyg>
+         </formElements>
       </field>
 
    </fieldset>

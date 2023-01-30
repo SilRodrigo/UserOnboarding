@@ -1,24 +1,66 @@
 /* 
  * @author Rodrigo Silva
- * @copyright Copyright (c) 2022 Rodrigo Silva (https://github.com/SilRodrigo)
- * @package Rsilva_Base
+ * @copyright Copyright (c) 2023 Rodrigo Silva (https://github.com/SilRodrigo)
+ * @package Rsilva_UserOnboarding
  */
 
 define([
     'jquery',
     'ko',
+    'uiRegistry',
     'Magento_Ui/js/form/element/abstract',
     'highlight',
-], function ($, ko, Abstract, highlight) {
+    'introJs',
+    './onboarding/modal',
+], function ($, ko, uiRegistry, Abstract, highlight, introJs, modal) {
     'use strict';
 
     const IFRAME_CONFIG = {
         WIDTH: '100%',
         HEIGHT: '500px'
-    }
+    };
 
     return Abstract.extend({
 
+        // Configurations triggered by afterRender
+
+        /**
+         * Instantiate editing modal
+         * @param {HTMLElement} e 
+         */
+        initModal(e) {
+            const self = this;
+            this.modal = modal($(e), {
+                buttons: [{
+                    text: $.mage.__('Confirm'),
+                    class: 'primary',
+                    click: function () {
+                        /* Add confirmation logic here */
+                        this.closeModal();
+                    }
+                }]
+            });
+        },
+
+        /**
+         * @param {HTMLIFrameElement} scope 
+         */
+        setIframeScope(scope) {
+            this.iframe.scope = scope;
+            scope.addEventListener('load', () => {
+                let currentBody = scope.contentDocument.querySelector('body'),
+                    scopeWindow = scope.contentWindow,
+                    actions = {
+                        click: (e) => this.callModal(e)
+                    }
+                this.highlight = highlight(currentBody, scopeWindow, actions);
+                this.stopLoading();
+            })
+        },
+
+        /**
+         * @var {Object} defaults
+         */
         defaults: {
             iframe: {
                 url: ko.observable(''),
@@ -26,14 +68,8 @@ define([
                 height: IFRAME_CONFIG.HEIGHT,
                 scope: null
             },
-        },
-
-        initialize() {
-            this._super();
-            this.iframe.url.subscribe(() => {
-
-            })
-            return this;
+            highlight: null,
+            modal: null
         },
 
         startLoading() {
@@ -45,16 +81,36 @@ define([
         },
 
         /**
-         * @param {HTMLIFrameElement} scope 
+         * Toggle iframe inspecting mode
          */
-        setIframeScope(scope) {
-            this.iframe.scope = scope;
-            scope.addEventListener('load', () => {
-                this.stopLoading();
-            })
+        toggleInspecting() {
+            this.highlight.toggle();
         },
 
         /**
+         * Call editing modal
+         */
+        callModal() {
+            this.modal.call();
+        },
+
+        /**
+         * Pops up current iframe for editing
+         */
+        startOnboardingCreation() {
+            this.iframe.scope.parentElement.classList.add('creating');
+        },
+
+        /**
+         * Closes iframe popup
+         */
+        closeOnboardingCreation() {
+            this.iframe.scope.parentElement.classList.remove('creating');
+            if (this.highlight) this.highlight.stop();
+        },
+
+        /**
+         * Render passing url to iframe element
          * @param {string} url 
          * @returns 
          */
@@ -64,17 +120,6 @@ define([
             this.iframe.url(url);
             this.visible(true);
         },
-
-        startOnboardingCreation() {
-            this.iframe.scope.parentElement.classList.add('creating');
-            let currentBody = this.iframe.scope.contentDocument.querySelector('body'),
-                scopeWindow = this.iframe.scope.contentWindow;
-            highlight(currentBody, scopeWindow);
-        },
-
-        closeOnboardingCreation() {
-            this.iframe.scope.parentElement.classList.remove('creating');
-        }
 
     });
 

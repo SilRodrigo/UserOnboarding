@@ -1,16 +1,16 @@
 /* 
  * @author Rodrigo Silva
- * @copyright Copyright (c) 2022 Rodrigo Silva (https://github.com/SilRodrigo)
- * @package Rsilva_Base
+ * @copyright Copyright (c) 2023 Rodrigo Silva (https://github.com/SilRodrigo)
+ * @package Rsilva_UserOnboarding
  */
 
 define([
     'jquery',
     'ko',
-    'Magento_Ui/js/form/element/abstract',
     'uiRegistry',
+    'Magento_Ui/js/form/element/abstract',
     'Magento_Ui/js/modal/alert',
-], function ($, ko, Abstract, uiRegistry, alert) {
+], function ($, ko, uiRegistry, Abstract, alert) {
     'use strict';
 
     const URL_CONFIG = {
@@ -18,7 +18,7 @@ define([
         HOST: location.host,
         ORIGIN: location.protocol + '//' + location.host + '/'
     }
-    const onboarding_registry = 'user_onboarding_form.user_onboarding_form.onboarding_field.onboarding';
+    const ONBOARDING_REGISTRY = 'user_onboarding_form.user_onboarding_form.onboarding_field.onboarding';
 
     return Abstract.extend({
 
@@ -41,14 +41,6 @@ define([
                 },
             });
             return this;
-        },
-
-        /**
-         * @returns Object
-         */
-        getOnboardingComponent() {
-            if (!this.onboardingComponent) this.onboardingComponent = uiRegistry.get(onboarding_registry);
-            return this.onboardingComponent;
         },
 
         /**
@@ -99,7 +91,7 @@ define([
                 if (!valid_url) return;
                 this.value(valid_url);
                 this.source.data.page_url = valid_url;
-                uiRegistry.get(onboarding_registry, onboarding => {
+                uiRegistry.get(ONBOARDING_REGISTRY, onboarding => {
                     onboarding.renderIframe(valid_url)
                 });
             } catch (error) {

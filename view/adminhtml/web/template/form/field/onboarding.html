@@ -20,19 +20,86 @@
                                 afterRender: setIframeScope"
                     frameborder="0"></iframe>
             <div class="create-action d-flex align-items-center justify-content-center">
-                <button data-bind="click: startOnboardingCreation">
+                <button class="plus-icon" data-bind="click: startOnboardingCreation">
                     <span class="lpad-5" data-bind="i18n: 'Create new onboarding'"></span>
                 </button>
             </div>
             <div class="editing-action onboarding-menu pad-10">
-                <button id="close_creation_btn" data-bind="click: closeOnboardingCreation"></button>
-                <button id="save_creation_btn" class="lmarg-10 save primary" data-bind="i18n: 'Save'"></button>
+                <button id="close_creation_btn" class="rmarg-10 x-mark-icon"
+                        data-bind="click: closeOnboardingCreation"></button>
+                <button id="inspect_btn" data-bind="click: toggleInspecting, i18n: 'Inspect'"></button>
+                <button id="save_creation_btn" class="save primary" data-bind="i18n: 'Save'"></button>
+            </div>
+            <div class="list-container">
+                <div class="steps-list onboarding-menu bmarg-10">
+                    <div class="header-list d-flex justify-content-between pad-10 bold">
+                        <div>
+                            <span data-bind="i18n: 'Steps'"></span>
+                        </div>
+                        <div>
+                            <span class="rpad-10" data-bind="text: 0"></span>
+                        </div>
+                    </div>
+                    <div class="content-list pointer">
+                        <!-- each -->
+                        <!--  -->
+                        <!-- add new -->
+                        <div class="d-flex justify-content-between pad-10" data-bind="click: callModal">
+                            <div class="rpad-10">
+                                <span class="box-clamp-1" data-bind="i18n: 'Add new step'"></span>
+                            </div>
+                            <div class="bold">
+                                <span class="fs-12 plus-icon"></span>
+                            </div>
+                        </div>
+                        <!--  -->
+                    </div>
+                </div>
+                <div class="hints-list onboarding-menu">
+                    <div class="header-list d-flex justify-content-between pad-10 bold">
+                        <div>
+                            <span data-bind="i18n: 'Hints'"></span>
+                        </div>
+                        <div>
+                            <span class="rpad-10" data-bind="text: 0"></span>
+                        </div>
+                    </div>
+                    <div class="content-list pointer">
+                        <!-- each -->
+                        <!--  -->
+                        <!-- add new -->
+                        <div class="d-flex justify-content-between pad-10">
+                            <div class="rpad-10">
+                                <span class="box-clamp-1" data-bind="i18n: 'Add new hint'"></span>
+                            </div>
+                            <div class="bold">
+                                <span class="fs-12 plus-icon"></span>
+                            </div>
+                        </div>
+                        <!--  -->
+                    </div>
+                </div>
+            </div>
+            <div id="modal" data-bind="afterRender: initModal">
+                <div class="tpad-10 bpad-20 input-fit">
+                    <label class="rpad-10 fs-18 tpad-5" for="title">Title</label>
+                    <span>
+                        <input class="admin__control-text" type="text" name="title" id="title">
+                    </span>
+                </div>
             </div>
         </div>
     </div>
-    <div class="admin__field-config pad-10 onboarding-menu">
-        <div>
-            <div class="fs-18">Created onboardings:</div>
+    <div class="admin__field-config">
+        <div class="bmarg-10 pad-10 onboarding-menu">
+            <div>
+                <div class="fs-18">Created Steps:</div>
+            </div>
+        </div>
+        <div class="pad-10 onboarding-menu">
+            <div>
+                <div class="fs-18">Created Hints:</div>
+            </div>
         </div>
     </div>
 </div>
