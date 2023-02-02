@@ -7,7 +7,8 @@ var config = {
     map: {
         '*': {
             'highlight': 'Rsilva_UserOnboarding/js/utils/highlight',
-            'introJs': 'Rsilva_UserOnboarding/js/utils/intro'
+            'introJs': 'Rsilva_UserOnboarding/js/utils/intro',
+            'cssSelectorGenerator': 'Rsilva_UserOnboarding/js/utils/cssSelectorGenerator'
         }
     }
 };

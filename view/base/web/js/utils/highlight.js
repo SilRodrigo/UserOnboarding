@@ -13,6 +13,11 @@ define([
         #currentlyHighlightedItem;
 
         /**
+         * @type {HTMLElement}
+         */
+        #validSelectedElement;
+
+        /**
          * @type {HTMLDivElement}
          */
         #highlight;
@@ -58,12 +63,13 @@ define([
             this.#page.addEventListener('mousedown', (e) => {
                 if (!this.#is_active) return;
                 e.preventDefault();
+                this.#validSelectedElement = e.target;
                 this.#highlight.style.pointerEvents = 'auto';
             });
             this.#page.addEventListener('mouseup', (e) => {
                 if (!this.#is_active) return;
                 e.preventDefault();
-                this.#actions.click(e);
+                this.#actions.click(this.validSelectedElement);
                 this.#highlight.style.pointerEvents = 'none';
             });
 
@@ -113,6 +119,10 @@ define([
 
         isActive() {
             return this.#is_active;
+        }
+
+        get validSelectedElement() {
+            return this.#validSelectedElement;
         }
     }
 
