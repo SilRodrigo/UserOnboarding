@@ -7,7 +7,7 @@
 define([
     'jquery',
     'ko',
-    'cssSelectorGenerator'
+    'cssSelectorGenerator',
 ], function ($, ko, selectorGen) {
     'use strict';
 
@@ -55,8 +55,20 @@ define([
             this.#elementSelector = selectorGen(this.#element);
         }
 
-        constructor({ title, content, element }) {
+        /**
+         * 
+         * @param {string} selector 
+         * @param {HTMLElement} scope 
+         * @returns 
+         */
+        #restoreElement(selector, scope) {
+            let element = scope.querySelector(selector);
+            if (element) return element;
+        }
+
+        constructor({ title, content, element, selector, scope }) {
             if (this.constructor == OnboardingItem) throw new Error("Abstract classes can't be instantiated.");
+            if (selector && scope) element = this.#restoreElement(selector, scope);
             this.save({ title, content, element })
         }
 
@@ -70,6 +82,9 @@ define([
 
         get element() {
             return this.#element;
+        }
+        get selector() {
+            return this.#elementSelector;
         }
 
         save({ title, content, element }) {
@@ -95,6 +110,26 @@ define([
                 this.#is_displayed = false;
                 this.#element.style.backgroundColor = '';
             })
+        }
+
+        /**
+         * Prepare data for IntroJs format
+         * @returns string
+         */
+        prepareDataForIntroJs(scope = document) {
+            return {
+                title: this.title,
+                intro: this.content,
+                element: scope.querySelector(this.#elementSelector)
+            }
+        }
+
+        getSerializedData() {
+            return {
+                title: this.title,
+                content: this.content,
+                selector: this.selector
+            }
         }
 
     }

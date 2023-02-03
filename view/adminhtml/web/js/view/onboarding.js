@@ -10,7 +10,7 @@ define([
     'Magento_Ui/js/form/element/abstract',
     'highlight',
     './onboarding/modal',
-    './onboarding/intro',
+    'introJs',
     'OnboardingStep',
 ], function ($, ko, Abstract, highlight, modal, introJs, Step) {
     'use strict';
@@ -49,6 +49,7 @@ define([
             onboarding: {
                 steps: ko.observableArray([]),
                 hints: ko.observableArray([]),
+                data: ko.observable('{}')
             },
             modeFunctions: {
                 steps: () => { },
@@ -89,6 +90,19 @@ define([
             return this;
         },
 
+        loadData() {
+            if (this.value() && Object.keys(JSON.parse(this.value())).length) {
+                let data = JSON.parse(this.value());
+                this.creation_mode(CREATION_MODE.STEPS);
+                data.steps.forEach(step => this.createStep(null, {
+                    ...step, scope: this.iframe.scope.contentDocument
+                }));
+                this.creation_mode('');
+                return;
+            }
+            this.value('{}');
+        },
+
         // Configurations triggered by afterRender
 
         /**
@@ -114,9 +128,17 @@ define([
                     scopeWindow = scope.contentWindow,
                     actions = {
                         click: e => { this.callModal(e) }
-                    }
+                    };
+                scopeWindow.introJs = introJs;
                 this.highlight = highlight(currentBody, scopeWindow, actions);
+                this.loadData();
                 this.stopLoading();
+            })
+        },
+
+        registerOnboardingField(element) {
+            this.onboarding.data.subscribe(value => {
+                $(element).val(value).change();
             })
         },
 
@@ -171,6 +193,9 @@ define([
             this.button.close.visible(!this.button.close.visible());
             this.status.is_reproducing(!this.status.is_reproducing());
             this.button.reproduce.label(this.status.is_reproducing() ? 'Reproducing' : 'Reproduce');
+            if (this.status.is_reproducing()) {
+                this.startIntroJs();
+            }
         },
 
         /**
@@ -199,6 +224,8 @@ define([
          */
         closeOnboardingCreation() {
             this.iframe.scope.parentElement.classList.remove('creating');
+            let serialized_data = this.serializeData();
+            this.save(serialized_data);
         },
 
         /**
@@ -227,9 +254,33 @@ define([
             this.onboarding.steps(current_steps);
         },
 
+        /**
+         * @description Not implemented yet
+         */
         createHint(data) {
             if (this.creation_mode() !== CREATION_MODE.HINTS) throw new Error(MESSAGES.INVALID_CREATION_MODE);
+        },
 
+        serializeData() {
+            let steps = [];
+            this.onboarding.steps().forEach((step, i) => {
+                let serialized_data = step.getSerializedData();
+                serialized_data.index = i;
+                steps.push(serialized_data);
+            })
+
+            return JSON.stringify({
+                steps: steps,
+            });
+        },
+
+        save(serialized_data) {
+            try {
+                JSON.parse(serialized_data).steps;
+            } catch (error) {
+                return alert(error);
+            }
+            this.onboarding.data(serialized_data);
         },
 
         // Validations
@@ -241,7 +292,27 @@ define([
         isValidCreationMode(creation_mode) {
             let is_valid = !!this.getCreationModeList().find(valid_mode => valid_mode === creation_mode);
             return is_valid;
-        }
+        },
+
+        // Lib IntroJs
+
+        prepareStepsForIntroJs() {
+            let stepsCollection = this.onboarding.steps();
+            let steps = [{
+                title: 'Preview',
+                intro: $.mage.__('This is a preview of your Onboarding')
+            }];
+            stepsCollection.forEach(step => {
+                steps.push(step.prepareDataForIntroJs(this.iframe.scope.contentDocument));
+            })
+            return { steps: steps };
+        },
+
+        startIntroJs() {
+            let options = { ...this.prepareStepsForIntroJs() },
+                intro = introJs();
+            intro.setOptions(options).start();
+        },
 
     });
 

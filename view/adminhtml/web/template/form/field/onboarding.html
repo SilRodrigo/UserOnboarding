@@ -82,7 +82,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="hints-list onboarding-menu">
+                <div class="hints-list onboarding-menu" data-bind="visible:false">
                     <div class="header-list d-flex justify-content-between pad-10 bold">
                         <div>
                             <span data-bind="i18n: 'Hints'"></span>
@@ -131,9 +131,21 @@
             <div class="fs-18" data-bind="text: onboarding.steps().length"></div>
         </div>
     </div>
-    <div class="pad-10 onboarding-menu">
+    <div class="pad-10 onboarding-menu" data-bind="visible: false">
         <div>
             <div class="fs-18">Created Hints:</div>
         </div>
+    </div>
+</div>
+
+<div class="admin__field _required" data-bind="visible: false" data-index="name">
+    <div class="admin__field-control">
+        <input class="admin__control-text" type="hidden" autocomplete="off"
+               data-bind="
+        value: value,
+        attr: {
+            name: inputName,
+        },
+        afterRender: registerOnboardingField">
     </div>
 </div>
