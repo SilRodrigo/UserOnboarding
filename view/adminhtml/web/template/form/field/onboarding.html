@@ -16,30 +16,42 @@
     <div class="admin__field-control"
          css="'_with-tooltip': $data.tooltip, '_with-reset': $data.showFallbackReset && $data.isDifferedFromDefault">
         <div id="iframe_container" class="pos-relative">
-            <iframe data-bind="attr: { src: iframe.url(), width: iframe.width, height: iframe.height },
-                                afterRender: setIframeScope"
-                    frameborder="0"></iframe>
+            <iframe data-bind="attr: {
+                                src: iframe.url(),
+                                width: iframe.width,
+                                height: iframe.height 
+                               },
+                               afterRender: setIframeScope"
+                    frameborder="0"
+                    id="onboarding"
+                    css="'reproducing': status.is_reproducing()">
+            </iframe>
             <div class="create-action d-flex align-items-center justify-content-center">
                 <button class="plus-icon" data-bind="click: startOnboardingCreation">
                     <span class="lpad-5" data-bind="i18n: 'Edit onboarding'"></span>
                 </button>
             </div>
             <div class="editing-action onboarding-menu pad-10">
-                <button css="button.inspect.css"
+                <button css="'inspect-icon-after active': status.is_inspecting(),
+                             'inspect-icon-after': !status.is_inspecting()"
                         data-bind="click: toggleInspecting,
                                    i18n: button.inspect.label,
-                                   enable: button.inspect.enable">
+                                   enable: button.inspect.enable,
+                                   visible: button.inspect.visible">
                 </button>
-                <button css="button.reproduce.css"
+                <button css="'x-mark-icon-after': status.is_reproducing(), 'play-icon-after' : !status.is_reproducing()"
                         data-bind="click: toggleReproduceOnboarding,
                                    i18n: button.reproduce.label,
-                                   enable: button.reproduce.enable">
+                                   enable: button.reproduce.enable,
+                                   visible: button.reproduce.visible">
                 </button>
                 <button class="save primary lmarg-10 x-mark-icon"
-                        data-bind="click: closeOnboardingCreation, enable: button.close.enable">
+                        data-bind="click: closeOnboardingCreation,
+                                   enable: button.close.enable,
+                                   visible: button.close.visible">
                 </button>
             </div>
-            <div class="list-container">
+            <div class="list-container" data-bind="visible: !status.is_reproducing()">
                 <div class="steps-list onboarding-menu bmarg-10">
                     <div class="header-list d-flex justify-content-between pad-10 bold">
                         <div>
@@ -51,14 +63,13 @@
                     </div>
                     <div class="content-list pointer">
                         <!-- ko if: onboarding.steps().length > 0 -->
-                        <div>
-                            <!-- ko foreach: onboarding.steps() -->
-                            <div class="item d-flex justify-content-between pad-10">
-                                <span class="box-clamp-1" data-bind="text: title"></span>
-                                <span class="rpad-10" data-bind="text: $index() + 1"></span>
-                            </div>
-                            <!-- /ko -->
+                        <!-- ko foreach: onboarding.steps() -->
+                        <div class="item d-flex justify-content-between pad-10"
+                             data-bind="afterRender: linkItemElement">
+                            <span class="box-clamp-1" data-bind="text: title"></span>
+                            <span class="rpad-10" data-bind="text: $index() + 1"></span>
                         </div>
+                        <!-- /ko -->
                         <!--/ko-->
                         <div class="item d-flex justify-content-between pad-10"
                              data-bind="click: function() { callModal() }">

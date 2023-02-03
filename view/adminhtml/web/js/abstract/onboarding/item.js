@@ -38,11 +38,16 @@ define([
          */
         #htmlContent;
 
+        /**
+         * @type {boolean}
+         */
+        #is_displayed = false;
+
         #generateHtmlContent() {
             if (!this.#content) return;
             let parser = document.createElement('div');
             parser.innerHTML = this.#content;
-            this.#htmlContent = parser.firstChild;
+            this.#htmlContent = parser;
         }
 
         #generateSelectorPath() {
@@ -63,13 +68,33 @@ define([
             return this.#content;
         }
 
+        get element() {
+            return this.#element;
+        }
+
         save({ title, content, element }) {
             this.#title = title;
             this.#content = content;
             this.#element = element;
             this.#generateSelectorPath();
             this.#generateHtmlContent();
-            console.log(this);
+        }
+
+        /**
+         * @param {HTMLHtmlElement} item
+         */
+        linkItemElement(item) {
+            if (!this.#element) return;
+            item.addEventListener('mousemove', () => {
+                if (this.#is_displayed) return;
+                this.#is_displayed = true;
+                this.#element.style.backgroundColor = '#9898ff';
+            }, true);
+            item.addEventListener('mouseleave', () => {
+                if (!this.#is_displayed) return;
+                this.#is_displayed = false;
+                this.#element.style.backgroundColor = '';
+            })
         }
 
     }

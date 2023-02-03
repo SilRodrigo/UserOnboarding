@@ -58,7 +58,7 @@ define([
             modal({ ...modal_options, ...custom_options }, this.modal);
             this.modal.on('modalclosed', () => {
                 this.wysiwyg.value('');
-                this.modal.find(CONFIG.TITLE_ID).val('').change();
+                this.modal.find(CONFIG.TITLE_ID).val('');
                 let wysiwyg_iframe = this.modal.find(CONFIG.WYSIWYG_IFRAME_ID);
                 if (wysiwyg_iframe.length) {
                     wysiwyg_iframe[0].contentDocument.querySelector('body').firstChild?.remove();

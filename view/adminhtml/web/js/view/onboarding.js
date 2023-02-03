@@ -10,8 +10,9 @@ define([
     'Magento_Ui/js/form/element/abstract',
     'highlight',
     './onboarding/modal',
-    'OnboardingStep'
-], function ($, ko, Abstract, highlight, modal, Step) {
+    './onboarding/intro',
+    'OnboardingStep',
+], function ($, ko, Abstract, highlight, modal, introJs, Step) {
     'use strict';
 
     const MESSAGES = {
@@ -55,16 +56,19 @@ define([
             },
             button: {
                 inspect: {
+                    visible: ko.observable(true),
                     enable: ko.observable(true),
                     label: ko.observable('Inspect'),
                     css: ko.observable('inspect-icon-after'),
                 },
                 reproduce: {
+                    visible: ko.observable(true),
                     enable: ko.observable(true),
                     label: ko.observable('Reproduce'),
                     css: ko.observable('play-icon-after'),
                 },
                 close: {
+                    visible: ko.observable(true),
                     enable: ko.observable(true)
                 }
             },
@@ -106,7 +110,7 @@ define([
         setIframeScope(scope) {
             this.iframe.scope = scope;
             scope.addEventListener('load', () => {
-                let currentBody = scope.contentDocument.querySelector('body'),
+                let currentBody = scope.contentDocument.body,
                     scopeWindow = scope.contentWindow,
                     actions = {
                         click: e => { this.callModal(e) }
@@ -156,27 +160,17 @@ define([
             this.button.reproduce.enable(!this.button.reproduce.enable());
             this.button.close.enable(!this.button.close.enable());
             this.status.is_inspecting(!this.status.is_inspecting());
-            if (this.status.is_inspecting()) {
-                this.button.inspect.label('Inspecting');
-                this.button.inspect.css('inspect-icon-after active');
-            } else {
-                this.button.inspect.label('Inspect');
-                this.button.inspect.css('inspect-icon-after');
-            }
+            this.button.inspect.label(this.status.is_inspecting() ? 'Inspecting' : 'Inspect');
             this.highlight.toggle();
         },
 
         toggleReproduceOnboarding() {
             this.button.inspect.enable(!this.button.inspect.enable());
+            this.button.inspect.visible(!this.button.inspect.visible());
             this.button.close.enable(!this.button.close.enable());
+            this.button.close.visible(!this.button.close.visible());
             this.status.is_reproducing(!this.status.is_reproducing());
-            if (this.status.is_reproducing()) {
-                this.button.reproduce.label('Reproducing');
-                this.button.reproduce.css('x-mark-icon-after');
-            } else {
-                this.button.reproduce.label('Reproduce');
-                this.button.reproduce.css('play-icon-after');
-            }
+            this.button.reproduce.label(this.status.is_reproducing() ? 'Reproducing' : 'Reproduce');
         },
 
         /**

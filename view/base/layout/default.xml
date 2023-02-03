@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+/**
+  * @author Rodrigo Silva
+ * @copyright Copyright (c) 2023 Rodrigo Silva (https://github.com/SilRodrigo)
+ * @package Rsilva_UserOnboarding
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Rsilva_UserOnboarding::css/lib/introjs.css"/>
+    </head>    
+</page>

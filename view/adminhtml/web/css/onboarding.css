@@ -52,13 +52,21 @@
     height: 80%;
     z-index: 751;
     animation: show-up .5s forwards;
+    transition: .25s;
+}
+
+iframe#onboarding.reproducing {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .editing-action {
     display: none;
     position: fixed;
     right: 2%;
-    top: 5%;
+    top: 40px;
     z-index: 751;
 }
 
@@ -71,7 +79,7 @@
     display: none;
     position: fixed;
     right: 2%;
-    top: 15%;
+    top: 110px;
     z-index: 751;
     transition: .25s;
     width: 7%;
@@ -121,7 +129,7 @@
     transition: .25s;
 }
 
-.active:hover{
+.active:hover {
     background: #6d6ddf !important;
 }
 

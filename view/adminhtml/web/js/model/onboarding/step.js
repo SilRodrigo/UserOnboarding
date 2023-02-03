@@ -5,10 +5,8 @@
  */
 
 define([
-    'jquery',
-    'ko',
     '../../abstract/onboarding/item'
-], function ($, ko, OnboardingItem) {
+], function (OnboardingItem) {
     'use strict';
 
     class Step extends OnboardingItem {

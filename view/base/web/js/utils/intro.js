@@ -2,6 +2,6 @@ define([
     '../lib/intro',
 ], function (introJs) {
     'use strict';
-
-    return introJs();
+    window.introJs = introJs;
+    return introJs;
 });
