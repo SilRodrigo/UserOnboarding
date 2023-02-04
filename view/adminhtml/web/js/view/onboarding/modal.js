@@ -14,6 +14,7 @@ define([
 
     const CONFIG = {
         TITLE_ID: '#title',
+        TYPE_ID: '#creation_type',
         WYSIWYG_IFRAME_ID: '#user_onboarding_form_wysiwyg_ifr',
         WYSIWYG_REGISTRY: 'user_onboarding_form.user_onboarding_form.onboarding_field.wysiwyg',
     }
@@ -86,6 +87,7 @@ define([
 
         getContent() {
             return {
+                type: this.modal.find(CONFIG.TYPE_ID).val(),
                 title: this.modal.find(CONFIG.TITLE_ID).val(),
                 content: this.wysiwyg.value()
             }

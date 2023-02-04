@@ -15,24 +15,27 @@ define([
 ], function ($, ko, Abstract, highlight, modal, introJs, Step) {
     'use strict';
 
-    const MESSAGES = {
-        INVALID_CREATION_MODE: $.mage.__('Invalid Creation Mode!')
-    }
+    const MESSAGES = {}
 
+    /**
+     * @var {Object} IFRAME_CONFIG
+     * @var {string} IFRAME_CONFIG.WIDTH
+     * @var {string} IFRAME_CONFIG.HEIGHT
+     */
     const IFRAME_CONFIG = {
         WIDTH: '100%',
         HEIGHT: '500px'
     };
 
-    const CREATION_MODE = {
-        STEPS: 'STEPS',
-        HINTS: 'HINTS'
-    }
-
     /**
-     * @type {string}
+     * @var {Object} CREATION_MODE
+     * @var {string} CREATION_MODE.STEP
+     * @var {string} CREATION_MODE.HINT
      */
-    const DEFAULT_MODE = CREATION_MODE.STEPS;
+    const CREATION_MODE = {
+        STEP: 'STEP',
+        HINT: 'HINT'
+    }
 
     return Abstract.extend({
 
@@ -51,9 +54,18 @@ define([
                 hints: ko.observableArray([]),
                 data: ko.observable('{}')
             },
-            modeFunctions: {
-                steps: () => { },
-                hints: () => { }
+            create: {
+                step: function (element, data) {
+                    let step = new Step({ ...data, element: element });
+                    try {
+                        let current_steps = this.onboarding.steps();
+                        current_steps.push(step);
+                        this.onboarding.steps(current_steps);
+                    } catch (error) {
+                        alert('create.step: ' + error);
+                    }
+                },
+                hint: () => { }
             },
             button: {
                 inspect: {
@@ -65,7 +77,7 @@ define([
                 reproduce: {
                     visible: ko.observable(true),
                     enable: ko.observable(true),
-                    label: ko.observable('Reproduce'),
+                    label: ko.observable('Preview'),
                     css: ko.observable('play-icon-after'),
                 },
                 close: {
@@ -83,24 +95,42 @@ define([
             creation_mode: ko.observable(''),
         },
 
-        initialize() {
-            this._super();
-            this.modeFunctions.steps = this.createStep;
-            this.modeFunctions.hints = this.createHint;
-            return this;
-        },
-
         loadData() {
             if (this.value() && Object.keys(JSON.parse(this.value())).length) {
                 let data = JSON.parse(this.value());
-                this.creation_mode(CREATION_MODE.STEPS);
-                data.steps.forEach(step => this.createStep(null, {
-                    ...step, scope: this.iframe.scope.contentDocument
-                }));
+                this.creation_mode(CREATION_MODE.STEP);
+                data.steps.forEach(step => {
+                    this.create.step.bind(this)(null, { ...step, scope: this.iframe.scope.contentDocument })
+                });
                 this.creation_mode('');
                 return;
             }
             this.value('{}');
+        },
+
+        // Getters
+
+        /**
+         * Returns a list of all creation type modes
+         * @returns {Array<string>}
+         */
+        getCreationModeList() {
+            let creationModeList = [];
+            for (const KEY in CREATION_MODE) {
+                creationModeList.push(CREATION_MODE[KEY]);
+            }
+            return creationModeList;
+        },
+
+        /**
+         * Returns an array for html select
+         * @returns Array
+         */
+        getCreationModeOptions() {
+            let modes = this.getCreationModeList(),
+                options = []
+            modes.forEach(mode => { options.push({ value: mode, label: mode }) });
+            return options;
         },
 
         // Configurations triggered by afterRender
@@ -142,7 +172,7 @@ define([
             })
         },
 
-        // Simple events
+        // Trigger and toggles events
 
         startLoading() {
             $('body').trigger('processStart');
@@ -150,29 +180,6 @@ define([
 
         stopLoading() {
             $('body').trigger('processStop');
-        },
-
-        /**
-         * Call editing modal
-         * @param {string} onboarding_mode 
-         */
-        callModal(element, onboarding_mode = DEFAULT_MODE) {
-            let callback = this.modeFunctions[onboarding_mode.toLowerCase()].bind(this);
-            if (!callback || this.status.is_locked()) return;
-            this.lock(true, onboarding_mode);
-            this.modal.call(data => {
-                callback(element, data);
-            });
-        },
-
-        /**
-         * Lock for new creations and editing
-         * @param {boolean} status 
-         */
-        lock(status, creation_mode) {
-            if (status && !this.isValidCreationMode(creation_mode)) throw new Error('Invalid parameters for locking');
-            this.creation_mode(creation_mode || DEFAULT_MODE);
-            this.status.is_locked(status);
         },
 
         /**
@@ -186,16 +193,45 @@ define([
             this.highlight.toggle();
         },
 
+        /**
+         * Toggle onboarding preview
+         */
         toggleReproduceOnboarding() {
             this.button.inspect.enable(!this.button.inspect.enable());
             this.button.inspect.visible(!this.button.inspect.visible());
             this.button.close.enable(!this.button.close.enable());
             this.button.close.visible(!this.button.close.visible());
             this.status.is_reproducing(!this.status.is_reproducing());
-            this.button.reproduce.label(this.status.is_reproducing() ? 'Reproducing' : 'Reproduce');
+            this.button.reproduce.label(this.status.is_reproducing() ? 'Exit Preview' : 'Preview');
             if (this.status.is_reproducing()) {
                 this.startIntroJs();
             }
+        },
+
+        /**
+         * Lock for new creations and editing
+         * @param {boolean} status 
+         */
+        lock(status) {
+            this.status.is_locked(status);
+        },
+
+        /**
+         * Call editing modal
+         * @param {HTMLElement} element 
+         */
+        callModal(element) {
+            if (this.status.is_locked()) return;
+            this.lock(true);
+            this.modal.call(data => {
+                try {
+                    let type = data.type.toLowerCase(),
+                        callback = this.create[type].bind(this);
+                    callback(element, data);
+                } catch (error) {
+                    alert('callModal: ' + error);
+                }
+            });
         },
 
         /**
@@ -220,45 +256,11 @@ define([
         },
 
         /**
-         * Closes iframe popup
+         * Closes iframe popup and saves created onboardings
          */
         closeOnboardingCreation() {
             this.iframe.scope.parentElement.classList.remove('creating');
-            let serialized_data = this.serializeData();
-            this.save(serialized_data);
-        },
-
-        /**
-         * @returns Array
-         */
-        getCreationModeList() {
-            let creationModeList = [];
-            for (const KEY in CREATION_MODE) {
-                creationModeList.push(CREATION_MODE[KEY]);
-            }
-            return creationModeList;
-        },
-
-        getCreationModeOptions() {
-            let modes = this.getCreationModeList(),
-                options = []
-            modes.forEach(mode => { options.push({ value: mode }) });
-            return options;
-        },
-
-        createStep(element, data) {
-            if (this.creation_mode() !== CREATION_MODE.STEPS) throw new Error(MESSAGES.INVALID_CREATION_MODE);
-            let step = new Step({ ...data, element: element });
-            let current_steps = this.onboarding.steps();
-            current_steps.push(step);
-            this.onboarding.steps(current_steps);
-        },
-
-        /**
-         * @description Not implemented yet
-         */
-        createHint(data) {
-            if (this.creation_mode() !== CREATION_MODE.HINTS) throw new Error(MESSAGES.INVALID_CREATION_MODE);
+            this.save(this.serializeData());
         },
 
         serializeData() {
