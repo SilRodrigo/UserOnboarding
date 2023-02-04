@@ -11,7 +11,19 @@ define([
 ], function ($, ko, selectorGen) {
     'use strict';
 
+    let id = 1;
+
     class OnboardingItem {
+
+        /**
+         * @type {number}
+         */
+        #id;
+
+        /**
+         * @type {string}
+         */
+        #type;
 
         /**
          * @type {string}
@@ -27,6 +39,11 @@ define([
          * @type {string}
          */
         #element;
+
+        /**
+         * @type {HTMLElement}
+         */
+        #item;
 
         /**
          * @type {string}
@@ -66,10 +83,21 @@ define([
             if (element) return element;
         }
 
-        constructor({ title, content, element, selector, scope }) {
+        constructor({ title, content, element, selector, scope, type }) {
             if (this.constructor == OnboardingItem) throw new Error("Abstract classes can't be instantiated.");
+            if (!type) throw new Error("Item type cannot be null");
+            this.#id = id++;
+            this.#type = type;
             if (selector && scope) element = this.#restoreElement(selector, scope);
             this.save({ title, content, element })
+        }
+
+        get id() {
+            return this.#id;
+        }
+
+        get type() {
+            return this.#type;
         }
 
         get title() {
@@ -83,6 +111,7 @@ define([
         get element() {
             return this.#element;
         }
+
         get selector() {
             return this.#elementSelector;
         }
@@ -99,6 +128,7 @@ define([
          * @param {HTMLHtmlElement} item
          */
         linkItemElement(item) {
+            this.#item = item;
             if (!this.#element) return;
             item.addEventListener('mousemove', () => {
                 if (this.#is_displayed) return;
@@ -110,6 +140,14 @@ define([
                 this.#is_displayed = false;
                 this.#element.style.backgroundColor = '';
             })
+        }
+
+        linkEditEvent(element, event) {
+            element.onclick = event;
+        }
+
+        unlinkHtml() {
+            this.#item.remove();
         }
 
         /**
@@ -128,7 +166,8 @@ define([
             return {
                 title: this.title,
                 content: this.content,
-                selector: this.selector
+                selector: this.selector,
+                type: this.type
             }
         }
 

@@ -14,6 +14,7 @@ define([
 
     const CONFIG = {
         TITLE_ID: '#title',
+        TYPE_ID: '#creation_type',
         WYSIWYG_IFRAME_ID: '#user_onboarding_form_wysiwyg_ifr',
         WYSIWYG_REGISTRY: 'user_onboarding_form.user_onboarding_form.onboarding_field.wysiwyg',
     }
@@ -57,12 +58,7 @@ define([
             const modal_options = this.#getModalOptions() || {};
             modal({ ...modal_options, ...custom_options }, this.modal);
             this.modal.on('modalclosed', () => {
-                this.wysiwyg.value('');
-                this.modal.find(CONFIG.TITLE_ID).val('');
-                let wysiwyg_iframe = this.modal.find(CONFIG.WYSIWYG_IFRAME_ID);
-                if (wysiwyg_iframe.length) {
-                    wysiwyg_iframe[0].contentDocument.querySelector('body').firstChild?.remove();
-                }
+                this.setContent({});
             })
         }
 
@@ -78,17 +74,38 @@ define([
             });
         }
 
-        call(callback) {
-            this.callback = callback;
+        setWysiwygContent(content = '') {
+            this.wysiwyg.value(content);
+            let wysiwyg_iframe = this.modal.find(CONFIG.WYSIWYG_IFRAME_ID);
+            if (wysiwyg_iframe.length) {
+                wysiwyg_iframe[0].contentDocument.querySelector('body').innerHTML = content;
+            }
+        }
+
+        call(callback, content) {
             this.setWysiwygPosition();
+            this.callback = callback;
+            this.setContent(content);
             this.modal.modal('openModal');
         }
 
         getContent() {
             return {
+                type: this.modal.find(CONFIG.TYPE_ID).val().toLowerCase(),
                 title: this.modal.find(CONFIG.TITLE_ID).val(),
                 content: this.wysiwyg.value()
             }
+        }
+
+        /**
+         * @param {string} type
+         * @param {string} title
+         * @param {string} content
+         */
+        setContent({ type, title, content }) {
+            if (type) this.modal.find(CONFIG.TYPE_ID).val(type.toUpperCase());
+            this.modal.find(CONFIG.TITLE_ID).val(title);
+            this.setWysiwygContent(content);
         }
     }
 

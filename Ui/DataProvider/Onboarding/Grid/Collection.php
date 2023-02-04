@@ -6,7 +6,7 @@
  * @package Rsilva_UserOnboarding
  */
 
-namespace Rsilva\UserOnboarding\Ui\DataProvider\Onboarding\Listing;
+namespace Rsilva\UserOnboarding\Ui\DataProvider\Onboarding\Grid;
 
 use Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult;
 

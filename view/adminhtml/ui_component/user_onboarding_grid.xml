@@ -28,7 +28,7 @@
 
   <dataSource name="user_onboarding_grid_data_source">
     <argument name="dataProvider" xsi:type="configurableObject">
-      <argument name="class" xsi:type="string">Rsilva\UserOnboarding\Ui\DataProvider\Onboarding\ListingDataProvider</argument>
+      <argument name="class" xsi:type="string">Rsilva\UserOnboarding\Ui\DataProvider\Onboarding\GridDataProvider</argument>
       <argument name="name" xsi:type="string">user_onboarding_grid_data_source</argument>
       <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
       <argument name="requestFieldName" xsi:type="string">entity_id</argument>
@@ -69,7 +69,7 @@
       </settings>
     </column>
 
-    <actionsColumn name="actions" class="Rsilva\UserOnboarding\Ui\Component\Onboarding\Listing\Columns\Actions">
+    <actionsColumn name="actions" class="Rsilva\UserOnboarding\Ui\Component\Onboarding\Grid\Columns\Actions">
       <settings>
         <indexField>entity_id</indexField>
       </settings>

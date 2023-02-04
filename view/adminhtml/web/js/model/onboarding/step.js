@@ -11,7 +11,7 @@ define([
 
     class Step extends OnboardingItem {
         constructor(data) {
-            super(data)
+            super({...data, type : 'step'})
         }
     }
 

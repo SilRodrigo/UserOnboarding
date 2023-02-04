@@ -7,6 +7,8 @@
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Rsilva\UserOnboarding\Api\Data\OnboardingInterface" type="Rsilva\UserOnboarding\Model\Onboarding"/>
+
     <!--  GRID  -->
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
@@ -15,7 +17,7 @@
             </argument>
         </arguments>
     </type>
-    <virtualType name="OnboardingCollection" type="Rsilva\UserOnboarding\Ui\DataProvider\Onboarding\Listing\Collection">
+    <virtualType name="OnboardingCollection" type="Rsilva\UserOnboarding\Ui\DataProvider\Onboarding\Grid\Collection">
         <arguments>
             <argument name="mainTable" xsi:type="string">rsilva_user_onboarding</argument>
             <argument name="resourceModel" xsi:type="string">Rsilva\UserOnboarding\Model\ResourceModel\Onboarding</argument>

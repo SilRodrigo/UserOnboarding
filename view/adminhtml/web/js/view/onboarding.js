@@ -12,27 +12,38 @@ define([
     './onboarding/modal',
     'introJs',
     'OnboardingStep',
-], function ($, ko, Abstract, highlight, modal, introJs, Step) {
+    'Magento_Ui/js/modal/alert',
+], function ($, ko, Abstract, highlight, modal, introJs, Step, alertWidget) {
     'use strict';
 
-    const MESSAGES = {
-        INVALID_CREATION_MODE: $.mage.__('Invalid Creation Mode!')
+    const MESSAGE = {
+        NOT_IMPLEMENTED: $.mage.__('This function is not implemented yet'),
+        INVALID_COLLECTION: $.mage.__('Invalid collection reference'),
     }
 
+    /**
+     * @var {Object} IFRAME_CONFIG
+     * @var {string} IFRAME_CONFIG.WIDTH
+     * @var {string} IFRAME_CONFIG.HEIGHT
+     */
     const IFRAME_CONFIG = {
         WIDTH: '100%',
         HEIGHT: '500px'
     };
 
+    /**
+     * @var {Object} CREATION_MODE
+     * @var {string} CREATION_MODE.STEP
+     */
     const CREATION_MODE = {
-        STEPS: 'STEPS',
-        HINTS: 'HINTS'
+        STEP: 'STEP',
     }
 
-    /**
-     * @type {string}
-     */
-    const DEFAULT_MODE = CREATION_MODE.STEPS;
+    const DEFAULT_MODE = CREATION_MODE.STEP;
+    
+    const COLLECTION_REFERENCE = {
+        step: 'steps',
+    }
 
     return Abstract.extend({
 
@@ -49,11 +60,36 @@ define([
             onboarding: {
                 steps: ko.observableArray([]),
                 hints: ko.observableArray([]),
-                data: ko.observable('{}')
+                data: ko.observable('{}'),
+                add: function (collection_name, item, index) {
+                    let collection_reference = COLLECTION_REFERENCE[item.type];
+                    if (collection_reference !== collection_name) throw new Error(MESSAGE.INVALID_COLLECTION);
+                    let collection = this[collection_name]();
+                    if (typeof index === 'number') collection.splice(index, 0, item);
+                    else collection.push(item);
+                    this[collection_reference](collection);
+                },
+                delete: function (item, index) {
+                    let collection = this[COLLECTION_REFERENCE[item.type]]();
+                    collection.splice(index, 1);
+                    item.unlinkHtml();
+                },
+                clear: function () {
+                    this.steps([]);
+                    this.hints([]);
+                    this.data('{}');
+                }
             },
-            modeFunctions: {
-                steps: () => { },
-                hints: () => { }
+            create: {
+                step: function (element, data, index) {
+                    let step = new Step({ ...data, element: element });
+                    try {
+                        this.onboarding.add(COLLECTION_REFERENCE.step, step, index)
+                    } catch (error) {
+                        alert('create.step: ' + error);
+                    }
+                },
+                hint: () => { }
             },
             button: {
                 inspect: {
@@ -65,7 +101,7 @@ define([
                 reproduce: {
                     visible: ko.observable(true),
                     enable: ko.observable(true),
-                    label: ko.observable('Reproduce'),
+                    label: ko.observable('Preview'),
                     css: ko.observable('play-icon-after'),
                 },
                 close: {
@@ -80,27 +116,44 @@ define([
             },
             highlight: null,
             modal: null,
-            creation_mode: ko.observable(''),
-        },
-
-        initialize() {
-            this._super();
-            this.modeFunctions.steps = this.createStep;
-            this.modeFunctions.hints = this.createHint;
-            return this;
+            creation_mode: ko.observable(CREATION_MODE.STEP),
         },
 
         loadData() {
-            if (this.value() && Object.keys(JSON.parse(this.value())).length) {
-                let data = JSON.parse(this.value());
-                this.creation_mode(CREATION_MODE.STEPS);
-                data.steps.forEach(step => this.createStep(null, {
-                    ...step, scope: this.iframe.scope.contentDocument
-                }));
-                this.creation_mode('');
-                return;
+            if (!this.value()) return;
+            this.onboarding.clear();
+            let data = JSON.parse(this.value());
+            for (const key in data) {
+                data[key].forEach(item => {
+                    let create = this.create[item.type].bind(this);
+                    create(null, { ...item, scope: this.iframe.scope.contentDocument });
+                });
             }
-            this.value('{}');
+        },
+
+        // Getters
+
+        /**
+         * Returns a list of all creation type modes
+         * @returns {Array<string>}
+         */
+        getCreationModeList() {
+            let creationModeList = [];
+            for (const KEY in CREATION_MODE) {
+                creationModeList.push(CREATION_MODE[KEY]);
+            }
+            return creationModeList;
+        },
+
+        /**
+         * Returns an array for html select
+         * @returns Array
+         */
+        getCreationModeOptions() {
+            let modes = this.getCreationModeList(),
+                options = []
+            modes.forEach(mode => { options.push({ value: mode, label: mode }) });
+            return options;
         },
 
         // Configurations triggered by afterRender
@@ -127,7 +180,7 @@ define([
                 let currentBody = scope.contentDocument.body,
                     scopeWindow = scope.contentWindow,
                     actions = {
-                        click: e => { this.callModal(e) }
+                        click: e => { this.newItem(e) }
                     };
                 scopeWindow.introJs = introJs;
                 this.highlight = highlight(currentBody, scopeWindow, actions);
@@ -142,7 +195,7 @@ define([
             })
         },
 
-        // Simple events
+        // Trigger and toggles events
 
         startLoading() {
             $('body').trigger('processStart');
@@ -150,29 +203,6 @@ define([
 
         stopLoading() {
             $('body').trigger('processStop');
-        },
-
-        /**
-         * Call editing modal
-         * @param {string} onboarding_mode 
-         */
-        callModal(element, onboarding_mode = DEFAULT_MODE) {
-            let callback = this.modeFunctions[onboarding_mode.toLowerCase()].bind(this);
-            if (!callback || this.status.is_locked()) return;
-            this.lock(true, onboarding_mode);
-            this.modal.call(data => {
-                callback(element, data);
-            });
-        },
-
-        /**
-         * Lock for new creations and editing
-         * @param {boolean} status 
-         */
-        lock(status, creation_mode) {
-            if (status && !this.isValidCreationMode(creation_mode)) throw new Error('Invalid parameters for locking');
-            this.creation_mode(creation_mode || DEFAULT_MODE);
-            this.status.is_locked(status);
         },
 
         /**
@@ -186,16 +216,36 @@ define([
             this.highlight.toggle();
         },
 
+        /**
+         * Toggle onboarding preview
+         */
         toggleReproduceOnboarding() {
             this.button.inspect.enable(!this.button.inspect.enable());
             this.button.inspect.visible(!this.button.inspect.visible());
             this.button.close.enable(!this.button.close.enable());
             this.button.close.visible(!this.button.close.visible());
             this.status.is_reproducing(!this.status.is_reproducing());
-            this.button.reproduce.label(this.status.is_reproducing() ? 'Reproducing' : 'Reproduce');
+            this.button.reproduce.label(this.status.is_reproducing() ? 'Exit Preview' : 'Preview');
             if (this.status.is_reproducing()) {
                 this.startIntroJs();
             }
+        },
+
+        /**
+         * Lock for new creations and editing
+         * @param {boolean} status 
+         */
+        lock(status) {
+            this.status.is_locked(status);
+        },
+
+        /**
+         * @param {Function} callback
+         */
+        callModal(callback, content) {
+            if (this.status.is_locked()) return;
+            this.lock(true);
+            this.modal.call(callback, content);
         },
 
         /**
@@ -220,45 +270,11 @@ define([
         },
 
         /**
-         * Closes iframe popup
+         * Closes iframe popup and saves created onboardings
          */
         closeOnboardingCreation() {
             this.iframe.scope.parentElement.classList.remove('creating');
-            let serialized_data = this.serializeData();
-            this.save(serialized_data);
-        },
-
-        /**
-         * @returns Array
-         */
-        getCreationModeList() {
-            let creationModeList = [];
-            for (const KEY in CREATION_MODE) {
-                creationModeList.push(CREATION_MODE[KEY]);
-            }
-            return creationModeList;
-        },
-
-        getCreationModeOptions() {
-            let modes = this.getCreationModeList(),
-                options = []
-            modes.forEach(mode => { options.push({ value: mode }) });
-            return options;
-        },
-
-        createStep(element, data) {
-            if (this.creation_mode() !== CREATION_MODE.STEPS) throw new Error(MESSAGES.INVALID_CREATION_MODE);
-            let step = new Step({ ...data, element: element });
-            let current_steps = this.onboarding.steps();
-            current_steps.push(step);
-            this.onboarding.steps(current_steps);
-        },
-
-        /**
-         * @description Not implemented yet
-         */
-        createHint(data) {
-            if (this.creation_mode() !== CREATION_MODE.HINTS) throw new Error(MESSAGES.INVALID_CREATION_MODE);
+            this.save(this.serializeData());
         },
 
         serializeData() {
@@ -271,6 +287,52 @@ define([
 
             return JSON.stringify({
                 steps: steps,
+            });
+        },
+
+        newItem(target_element) {
+            this.callModal(data => {
+                try {
+                    let type = data.type.toLowerCase(),
+                        callback = this.create[type].bind(this);
+                    callback(target_element, data);
+                } catch (error) {
+                    alert('callModal: ' + error);
+                }
+            }, { type: DEFAULT_MODE });
+        },
+
+        editItem(item, current_index) {
+            this.callModal(data => {
+                if (item.type !== data.type) return alert(MESSAGE.NOT_IMPLEMENTED);
+                let collection = this.onboarding[COLLECTION_REFERENCE[data.type]](),
+                    callback = this.create[data.type].bind(this);
+                collection.splice(current_index, 1);
+                callback(item.element, data, current_index);
+            }, item.getSerializedData())
+        },
+
+        deleteItem(item, current_index) {
+            const self = this;
+            alertWidget({
+                title: $.mage.__('Are you sure you want to delete this %1?').replace('%1', $.mage.__(item.type)),
+                buttons: [
+                    {
+                        text: $.mage.__('Cancel'),
+                        class: 'action-secondary action-dismiss',
+                        click: function () {
+                            this.closeModal(true);
+                        }
+                    },
+                    {
+                        text: $.mage.__('Delete'),
+                        class: 'action-primary action-accept',
+                        click: function () {
+                            self.onboarding.delete(item, current_index);
+                            this.closeModal(true);
+                        }
+                    },
+                ]
             });
         },
 

@@ -6,7 +6,7 @@
  * @package Rsilva_Vitrine
  */
 
-namespace Rsilva\UserOnboarding\Ui\Component\Onboarding\Listing\Columns;
+namespace Rsilva\UserOnboarding\Ui\Component\Onboarding\Grid\Columns;
 
 use Rsilva\UserOnboarding\Controller\Adminhtml\Index\Index as IndexController;
 use Rsilva\UserOnboarding\Controller\Adminhtml\Index\Edit as EditController;
