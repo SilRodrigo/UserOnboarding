@@ -64,15 +64,22 @@
                     <div class="content-list pointer">
                         <!-- ko if: onboarding.steps().length > 0 -->
                         <!-- ko foreach: onboarding.steps() -->
-                        <div class="item d-flex justify-content-between pad-10"
-                             data-bind="afterRender: linkItemElement">
-                            <span class="box-clamp-1" data-bind="text: title"></span>
-                            <span class="rpad-10" data-bind="text: $index() + 1"></span>
+                        <div class="created-item d-flex overflow-hidden" data-bind="afterRender: linkItemElement">
+                            <div class="item d-flex justify-content-between pad-10 col-12"
+                                 data-bind="click: function() { $parent.editItem(this, $index()) }">
+                                <span class="box-clamp-1" data-bind="text: '# ' + title"></span>
+                                <span class="rpad-10" data-bind="text: $index() + 1"></span>
+                            </div>
+                            <div class="item-delete text-center">
+                                <div class="pad-10 border-none bg-deep-red garbage-icon text-white"
+                                     data-bind="click: function() { $parent.deleteItem(this, $index()) }">
+                                </div>
+                            </div>
                         </div>
                         <!-- /ko -->
                         <!--/ko-->
                         <div class="item d-flex justify-content-between pad-10"
-                             data-bind="click: function() { callModal() }">
+                             data-bind="click: function() { newItem() }">
                             <div class="rpad-10">
                                 <span class="box-clamp-1" data-bind="i18n: 'Add new step'"></span>
                             </div>
@@ -124,6 +131,8 @@
         </div>
     </div>
 </div>
+
+<!-- Lateral outside iframe cards -->
 <div class="admin__field-config">
     <div class="bmarg-10 pad-10 onboarding-menu">
         <div class="d-flex justify-content-between">
@@ -138,6 +147,7 @@
     </div>
 </div>
 
+<!-- This is input stores the onboarding information to be saved on DB -->
 <div class="admin__field _required" data-bind="visible: false" data-index="name">
     <div class="admin__field-control">
         <input class="admin__control-text" type="hidden" autocomplete="off"

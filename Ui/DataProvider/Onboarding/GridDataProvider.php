@@ -10,6 +10,6 @@ namespace Rsilva\UserOnboarding\Ui\DataProvider\Onboarding;
 
 use Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider;
 
-class ListingDataProvider extends DataProvider
+class GridDataProvider extends DataProvider
 {
 }

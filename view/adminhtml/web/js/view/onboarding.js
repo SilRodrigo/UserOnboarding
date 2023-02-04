@@ -12,10 +12,14 @@ define([
     './onboarding/modal',
     'introJs',
     'OnboardingStep',
-], function ($, ko, Abstract, highlight, modal, introJs, Step) {
+    'Magento_Ui/js/modal/alert',
+], function ($, ko, Abstract, highlight, modal, introJs, Step, alertWidget) {
     'use strict';
 
-    const MESSAGES = {}
+    const MESSAGE = {
+        NOT_IMPLEMENTED: $.mage.__('This function is not implemented yet'),
+        INVALID_COLLECTION: $.mage.__('Invalid collection reference'),
+    }
 
     /**
      * @var {Object} IFRAME_CONFIG
@@ -30,11 +34,15 @@ define([
     /**
      * @var {Object} CREATION_MODE
      * @var {string} CREATION_MODE.STEP
-     * @var {string} CREATION_MODE.HINT
      */
     const CREATION_MODE = {
         STEP: 'STEP',
-        HINT: 'HINT'
+    }
+
+    const DEFAULT_MODE = CREATION_MODE.STEP;
+    
+    const COLLECTION_REFERENCE = {
+        step: 'steps',
     }
 
     return Abstract.extend({
@@ -52,15 +60,31 @@ define([
             onboarding: {
                 steps: ko.observableArray([]),
                 hints: ko.observableArray([]),
-                data: ko.observable('{}')
+                data: ko.observable('{}'),
+                add: function (collection_name, item, index) {
+                    let collection_reference = COLLECTION_REFERENCE[item.type];
+                    if (collection_reference !== collection_name) throw new Error(MESSAGE.INVALID_COLLECTION);
+                    let collection = this[collection_name]();
+                    if (typeof index === 'number') collection.splice(index, 0, item);
+                    else collection.push(item);
+                    this[collection_reference](collection);
+                },
+                delete: function (item, index) {
+                    let collection = this[COLLECTION_REFERENCE[item.type]]();
+                    collection.splice(index, 1);
+                    item.unlinkHtml();
+                },
+                clear: function () {
+                    this.steps([]);
+                    this.hints([]);
+                    this.data('{}');
+                }
             },
             create: {
-                step: function (element, data) {
+                step: function (element, data, index) {
                     let step = new Step({ ...data, element: element });
                     try {
-                        let current_steps = this.onboarding.steps();
-                        current_steps.push(step);
-                        this.onboarding.steps(current_steps);
+                        this.onboarding.add(COLLECTION_REFERENCE.step, step, index)
                     } catch (error) {
                         alert('create.step: ' + error);
                     }
@@ -92,20 +116,19 @@ define([
             },
             highlight: null,
             modal: null,
-            creation_mode: ko.observable(''),
+            creation_mode: ko.observable(CREATION_MODE.STEP),
         },
 
         loadData() {
-            if (this.value() && Object.keys(JSON.parse(this.value())).length) {
-                let data = JSON.parse(this.value());
-                this.creation_mode(CREATION_MODE.STEP);
-                data.steps.forEach(step => {
-                    this.create.step.bind(this)(null, { ...step, scope: this.iframe.scope.contentDocument })
+            if (!this.value()) return;
+            this.onboarding.clear();
+            let data = JSON.parse(this.value());
+            for (const key in data) {
+                data[key].forEach(item => {
+                    let create = this.create[item.type].bind(this);
+                    create(null, { ...item, scope: this.iframe.scope.contentDocument });
                 });
-                this.creation_mode('');
-                return;
             }
-            this.value('{}');
         },
 
         // Getters
@@ -157,7 +180,7 @@ define([
                 let currentBody = scope.contentDocument.body,
                     scopeWindow = scope.contentWindow,
                     actions = {
-                        click: e => { this.callModal(e) }
+                        click: e => { this.newItem(e) }
                     };
                 scopeWindow.introJs = introJs;
                 this.highlight = highlight(currentBody, scopeWindow, actions);
@@ -217,21 +240,12 @@ define([
         },
 
         /**
-         * Call editing modal
-         * @param {HTMLElement} element 
+         * @param {Function} callback
          */
-        callModal(element) {
+        callModal(callback, content) {
             if (this.status.is_locked()) return;
             this.lock(true);
-            this.modal.call(data => {
-                try {
-                    let type = data.type.toLowerCase(),
-                        callback = this.create[type].bind(this);
-                    callback(element, data);
-                } catch (error) {
-                    alert('callModal: ' + error);
-                }
-            });
+            this.modal.call(callback, content);
         },
 
         /**
@@ -273,6 +287,52 @@ define([
 
             return JSON.stringify({
                 steps: steps,
+            });
+        },
+
+        newItem(target_element) {
+            this.callModal(data => {
+                try {
+                    let type = data.type.toLowerCase(),
+                        callback = this.create[type].bind(this);
+                    callback(target_element, data);
+                } catch (error) {
+                    alert('callModal: ' + error);
+                }
+            }, { type: DEFAULT_MODE });
+        },
+
+        editItem(item, current_index) {
+            this.callModal(data => {
+                if (item.type !== data.type) return alert(MESSAGE.NOT_IMPLEMENTED);
+                let collection = this.onboarding[COLLECTION_REFERENCE[data.type]](),
+                    callback = this.create[data.type].bind(this);
+                collection.splice(current_index, 1);
+                callback(item.element, data, current_index);
+            }, item.getSerializedData())
+        },
+
+        deleteItem(item, current_index) {
+            const self = this;
+            alertWidget({
+                title: $.mage.__('Are you sure you want to delete this %1?').replace('%1', $.mage.__(item.type)),
+                buttons: [
+                    {
+                        text: $.mage.__('Cancel'),
+                        class: 'action-secondary action-dismiss',
+                        click: function () {
+                            this.closeModal(true);
+                        }
+                    },
+                    {
+                        text: $.mage.__('Delete'),
+                        class: 'action-primary action-accept',
+                        click: function () {
+                            self.onboarding.delete(item, current_index);
+                            this.closeModal(true);
+                        }
+                    },
+                ]
             });
         },
 

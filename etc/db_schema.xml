@@ -12,8 +12,7 @@
         <column xsi:type="boolean" name="enabled" default="false"/>
         <column xsi:type="varchar" name="name" nullable="false"/>
         <column xsi:type="varchar" name="page_url" nullable="false"/>
-        <column xsi:type="varchar" name="layout_handle" nullable="false"/>
-        <column xsi:type="json" name="onboarding" nullable="false"/>
+        <column xsi:type="text" name="onboarding" nullable="false"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Updated At"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
