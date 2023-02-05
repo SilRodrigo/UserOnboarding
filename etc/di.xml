@@ -8,6 +8,7 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Rsilva\UserOnboarding\Api\Data\OnboardingInterface" type="Rsilva\UserOnboarding\Model\Onboarding"/>
+    <preference for="Rsilva\UserOnboarding\Api\OnboardingRepositoryInterface" type="Rsilva\UserOnboarding\Model\OnboardingRepository"/>
 
     <!--  GRID  -->
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">

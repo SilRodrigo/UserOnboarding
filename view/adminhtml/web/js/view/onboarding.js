@@ -20,30 +20,21 @@ define([
         NOT_IMPLEMENTED: $.mage.__('This function is not implemented yet'),
         INVALID_COLLECTION: $.mage.__('Invalid collection reference'),
     }
-
-    /**
-     * @var {Object} IFRAME_CONFIG
-     * @var {string} IFRAME_CONFIG.WIDTH
-     * @var {string} IFRAME_CONFIG.HEIGHT
-     */
     const IFRAME_CONFIG = {
         WIDTH: '100%',
         HEIGHT: '500px'
     };
-
-    /**
-     * @var {Object} CREATION_MODE
-     * @var {string} CREATION_MODE.STEP
-     */
     const CREATION_MODE = {
         STEP: 'STEP',
     }
-
-    const DEFAULT_MODE = CREATION_MODE.STEP;
-    
     const COLLECTION_REFERENCE = {
         step: 'steps',
     }
+    const LIB = {
+        INTROJS: 'introjs'
+    }
+    const DEFAULT_MODE = CREATION_MODE.STEP;
+    const CURRENT_LIB = LIB.INTROJS;
 
     return Abstract.extend({
 
@@ -61,7 +52,8 @@ define([
                 steps: ko.observableArray([]),
                 hints: ko.observableArray([]),
                 data: ko.observable('{}'),
-                add: function (collection_name, item, index) {
+                data_lib: ko.observable('{}'),
+                add(collection_name, item, index) {
                     let collection_reference = COLLECTION_REFERENCE[item.type];
                     if (collection_reference !== collection_name) throw new Error(MESSAGE.INVALID_COLLECTION);
                     let collection = this[collection_name]();
@@ -69,19 +61,19 @@ define([
                     else collection.push(item);
                     this[collection_reference](collection);
                 },
-                delete: function (item, index) {
+                delete(item, index) {
                     let collection = this[COLLECTION_REFERENCE[item.type]]();
                     collection.splice(index, 1);
                     item.unlinkHtml();
                 },
-                clear: function () {
+                clear() {
                     this.steps([]);
                     this.hints([]);
                     this.data('{}');
                 }
             },
             create: {
-                step: function (element, data, index) {
+                step(element, data, index) {
                     let step = new Step({ ...data, element: element });
                     try {
                         this.onboarding.add(COLLECTION_REFERENCE.step, step, index)
@@ -113,6 +105,37 @@ define([
                 is_locked: ko.observable(false),
                 is_reproducing: ko.observable(false),
                 is_inspecting: ko.observable(false)
+            },
+            lib: {
+                name: CURRENT_LIB,
+                prepareData(item, scope = document, noQuery) {
+                    return {
+                        title: item.title,
+                        intro: item.content,
+                        element: noQuery ? item.selector : scope.querySelector(item.selector)
+                    }
+                },
+                prepareSteps(onboarding, scope, noQuery) {
+                    let stepsCollection = onboarding.steps(),
+                        steps = [],
+                        preview = {
+                            title: 'Preview',
+                            intro: $.mage.__('This is a preview of your Onboarding')
+                        }
+                    if (!noQuery) steps.push(preview);
+                    stepsCollection.forEach(step => {
+                        steps.push(this.prepareData(step, scope, noQuery));
+                    })
+                    return { steps: steps };
+                },
+                getData(onboarding, scope, noQuery) {
+                    return { ...this.prepareSteps(onboarding, scope, noQuery) }
+                },
+                start(onboarding, scope) {
+                    let options = this.getData(onboarding, scope),
+                        intro = introJs();
+                    intro.setOptions(options).start();
+                },
             },
             highlight: null,
             modal: null,
@@ -192,6 +215,7 @@ define([
         registerOnboardingField(element) {
             this.onboarding.data.subscribe(value => {
                 $(element).val(value).change();
+                this.source.data.data_lib = this.onboarding.data_lib();
             })
         },
 
@@ -227,7 +251,7 @@ define([
             this.status.is_reproducing(!this.status.is_reproducing());
             this.button.reproduce.label(this.status.is_reproducing() ? 'Exit Preview' : 'Preview');
             if (this.status.is_reproducing()) {
-                this.startIntroJs();
+                this.lib.start(this.onboarding, this.iframe.scope.contentDocument);
             }
         },
 
@@ -274,7 +298,7 @@ define([
          */
         closeOnboardingCreation() {
             this.iframe.scope.parentElement.classList.remove('creating');
-            this.save(this.serializeData());
+            this.save();
         },
 
         serializeData() {
@@ -336,12 +360,16 @@ define([
             });
         },
 
-        save(serialized_data) {
+        save() {
+            let serialized_data = this.serializeData(),
+                data_lib = this.lib.getData(this.onboarding, this.iframe.scope.contentDocument, true)
             try {
-                JSON.parse(serialized_data).steps;
+                JSON.parse(serialized_data);
+                data_lib = JSON.stringify(data_lib);
             } catch (error) {
-                return alert(error);
+                return alert('save: ' + error);
             }
+            this.onboarding.data_lib(data_lib);
             this.onboarding.data(serialized_data);
         },
 
@@ -358,23 +386,7 @@ define([
 
         // Lib IntroJs
 
-        prepareStepsForIntroJs() {
-            let stepsCollection = this.onboarding.steps();
-            let steps = [{
-                title: 'Preview',
-                intro: $.mage.__('This is a preview of your Onboarding')
-            }];
-            stepsCollection.forEach(step => {
-                steps.push(step.prepareDataForIntroJs(this.iframe.scope.contentDocument));
-            })
-            return { steps: steps };
-        },
 
-        startIntroJs() {
-            let options = { ...this.prepareStepsForIntroJs() },
-                intro = introJs();
-            intro.setOptions(options).start();
-        },
 
     });
 

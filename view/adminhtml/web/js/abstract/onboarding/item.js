@@ -150,18 +150,6 @@ define([
             this.#item.remove();
         }
 
-        /**
-         * Prepare data for IntroJs format
-         * @returns string
-         */
-        prepareDataForIntroJs(scope = document) {
-            return {
-                title: this.title,
-                intro: this.content,
-                element: scope.querySelector(this.#elementSelector)
-            }
-        }
-
         getSerializedData() {
             return {
                 title: this.title,

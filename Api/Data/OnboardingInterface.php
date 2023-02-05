@@ -23,5 +23,5 @@ interface OnboardingInterface
      * @return  mixed
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function __call();
+    public function __call($method, $args);
 }

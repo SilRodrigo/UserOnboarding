@@ -1,0 +1,23 @@
+<?php
+
+/** @var \Rsilva\UserOnboarding\Block\Onboarding  $block */
+?>
+
+<?php if ($onboarding = $block->get()) : ?>
+    <div class="introJs" data-bind="scope: 'loadIntro'"></div>
+
+    <script type="text/x-magento-init">
+        {
+         "*": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "loadIntro": {
+                        "component": "Rsilva_UserOnboarding/js/loadIntro",
+                        "onboarding": <?= $onboarding->toJson() ?>
+                    }
+                }
+            }
+        }
+    }
+    </script>
+<?php endif; ?>

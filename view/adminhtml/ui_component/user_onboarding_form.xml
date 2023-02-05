@@ -122,6 +122,18 @@
             </validation> -->
          </settings>
       </field>
+      <field formElement="input" name="data_lib" sortOrder="20">
+         <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+               <item name="visible" xsi:type="boolean">false</item>
+               <item name="source" xsi:type="string">data_lib</item>
+            </item>
+         </argument>
+         <settings>
+            <dataType>text</dataType>
+            <dataScope>data_lib</dataScope>
+         </settings>
+      </field>
       <field name="wysiwyg" sortOrder="10" formElement="wysiwyg" template="Rsilva_UserOnboarding/form/field">
          <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
