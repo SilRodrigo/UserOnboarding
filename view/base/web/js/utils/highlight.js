@@ -87,7 +87,7 @@ define([
                 'opacity': '0.4',
                 'border': '1px solid red',
                 'pointer-events': 'none',
-                'z-index': '750'
+                'z-index': '999'
             });
             return highlight;
         }

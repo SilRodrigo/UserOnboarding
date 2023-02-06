@@ -7,6 +7,7 @@ use Magento\Framework\Api\Search\FilterGroupBuilder;
 use Magento\Framework\Api\Search\SearchCriteriaBuilder;
 use Magento\Framework\Api\SortOrderBuilder;
 use Magento\Framework\View\Element\Template;
+use Magento\Framework\UrlInterface;
 use Rsilva\UserOnboarding\Api\Data\OnboardingInterface;
 use Rsilva\UserOnboarding\Api\OnboardingRepositoryInterface;
 
@@ -20,6 +21,7 @@ class Onboarding extends Template
         protected FilterGroupBuilder $filterGroupBuilder,
         protected FilterBuilder $filterBuilder,
         protected SortOrderBuilder $sortOrderBuilder,
+        protected UrlInterface $url,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -28,16 +30,17 @@ class Onboarding extends Template
     public function get()
     {
         $onboarding = false;
-        $layoutHandles = $this->getLayout()->getUpdate()->getHandles();
+        $routeParams = ['_use_rewrite' => true, '_forced_secure' => true];
+        $currentUrl = $this->url->getUrl('*/*/*', $routeParams);
 
         $filterGroups = [
-            /* $this->filterGroupBuilder->addFilter(
+            $this->filterGroupBuilder->addFilter(
                 $this->filterBuilder
-                    ->setField('layout_handle')
-                    ->setConditionType('in')
-                    ->setValue($layoutHandles)
+                    ->setField(OnboardingInterface::PAGE_URL)
+                    ->setConditionType(OnboardingRepositoryInterface::EQ)
+                    ->setValue($currentUrl)
                     ->create()
-            )->create(), */
+            )->create(),
             $this->filterGroupBuilder->addFilter(
                 $this->filterBuilder
                     ->setField(OnboardingInterface::ENABLED)
@@ -65,5 +68,4 @@ class Onboarding extends Template
 
         return $onboarding;
     }
-
 }

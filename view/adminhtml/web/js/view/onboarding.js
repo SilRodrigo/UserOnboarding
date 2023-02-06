@@ -7,34 +7,22 @@
 define([
     'jquery',
     'ko',
-    'Magento_Ui/js/form/element/abstract',
-    'highlight',
-    './onboarding/modal',
-    'introJs',
-    'OnboardingStep',
     'Magento_Ui/js/modal/alert',
-], function ($, ko, Abstract, highlight, modal, introJs, Step, alertWidget) {
+    'Magento_Ui/js/form/element/abstract',
+    'Onboarding',
+    'OnboardingStep',
+    'OnboardingLibHandler',
+    './onboarding/modal',
+    '../config/onboarding',
+    'highlight',
+    'introJs',
+], function ($, ko, alertWidget, Abstract, Onboarding, Step, LibHandler, modal, config, highlight, introJs) {
     'use strict';
 
-    const MESSAGE = {
-        NOT_IMPLEMENTED: $.mage.__('This function is not implemented yet'),
-        INVALID_COLLECTION: $.mage.__('Invalid collection reference'),
-    }
-    const IFRAME_CONFIG = {
-        WIDTH: '100%',
-        HEIGHT: '500px'
-    };
-    const CREATION_MODE = {
-        STEP: 'STEP',
-    }
-    const COLLECTION_REFERENCE = {
-        step: 'steps',
-    }
-    const LIB = {
-        INTROJS: 'introjs'
-    }
-    const DEFAULT_MODE = CREATION_MODE.STEP;
-    const CURRENT_LIB = LIB.INTROJS;
+    const CONFIG = { ...config };
+
+    const DEFAULT_MODE = CONFIG.CREATION_MODE.STEP;
+    const CURRENT_LIB = CONFIG.LIB.INTROJS;
 
     return Abstract.extend({
 
@@ -42,46 +30,23 @@ define([
          * @var {Object} defaults
          */
         defaults: {
+            onboarding: new Onboarding(),
+            lib: new LibHandler(CURRENT_LIB, introJs),
             iframe: {
                 url: ko.observable(''),
-                width: IFRAME_CONFIG.WIDTH,
-                height: IFRAME_CONFIG.HEIGHT,
+                width: CONFIG.IFRAME.WIDTH,
+                height: CONFIG.IFRAME.HEIGHT,
                 scope: null
-            },
-            onboarding: {
-                steps: ko.observableArray([]),
-                hints: ko.observableArray([]),
-                data: ko.observable('{}'),
-                data_lib: ko.observable('{}'),
-                add(collection_name, item, index) {
-                    let collection_reference = COLLECTION_REFERENCE[item.type];
-                    if (collection_reference !== collection_name) throw new Error(MESSAGE.INVALID_COLLECTION);
-                    let collection = this[collection_name]();
-                    if (typeof index === 'number') collection.splice(index, 0, item);
-                    else collection.push(item);
-                    this[collection_reference](collection);
-                },
-                delete(item, index) {
-                    let collection = this[COLLECTION_REFERENCE[item.type]]();
-                    collection.splice(index, 1);
-                    item.unlinkHtml();
-                },
-                clear() {
-                    this.steps([]);
-                    this.hints([]);
-                    this.data('{}');
-                }
             },
             create: {
                 step(element, data, index) {
                     let step = new Step({ ...data, element: element });
                     try {
-                        this.onboarding.add(COLLECTION_REFERENCE.step, step, index)
+                        this.onboarding.add(CONFIG.COLLECTION_REFERENCE.step, step, index)
                     } catch (error) {
                         alert('create.step: ' + error);
                     }
-                },
-                hint: () => { }
+                }
             },
             button: {
                 inspect: {
@@ -106,40 +71,9 @@ define([
                 is_reproducing: ko.observable(false),
                 is_inspecting: ko.observable(false)
             },
-            lib: {
-                name: CURRENT_LIB,
-                prepareData(item, scope = document, noQuery) {
-                    return {
-                        title: item.title,
-                        intro: item.content,
-                        element: noQuery ? item.selector : scope.querySelector(item.selector)
-                    }
-                },
-                prepareSteps(onboarding, scope, noQuery) {
-                    let stepsCollection = onboarding.steps(),
-                        steps = [],
-                        preview = {
-                            title: 'Preview',
-                            intro: $.mage.__('This is a preview of your Onboarding')
-                        }
-                    if (!noQuery) steps.push(preview);
-                    stepsCollection.forEach(step => {
-                        steps.push(this.prepareData(step, scope, noQuery));
-                    })
-                    return { steps: steps };
-                },
-                getData(onboarding, scope, noQuery) {
-                    return { ...this.prepareSteps(onboarding, scope, noQuery) }
-                },
-                start(onboarding, scope) {
-                    let options = this.getData(onboarding, scope),
-                        intro = introJs();
-                    intro.setOptions(options).start();
-                },
-            },
             highlight: null,
             modal: null,
-            creation_mode: ko.observable(CREATION_MODE.STEP),
+            creation_mode: ko.observable(DEFAULT_MODE),
         },
 
         loadData() {
@@ -162,8 +96,8 @@ define([
          */
         getCreationModeList() {
             let creationModeList = [];
-            for (const KEY in CREATION_MODE) {
-                creationModeList.push(CREATION_MODE[KEY]);
+            for (const KEY in CONFIG.CREATION_MODE) {
+                creationModeList.push(CONFIG.CREATION_MODE[KEY]);
             }
             return creationModeList;
         },
@@ -328,8 +262,8 @@ define([
 
         editItem(item, current_index) {
             this.callModal(data => {
-                if (item.type !== data.type) return alert(MESSAGE.NOT_IMPLEMENTED);
-                let collection = this.onboarding[COLLECTION_REFERENCE[data.type]](),
+                if (item.type !== data.type) return alert(CONFIG.MESSAGE.NOT_IMPLEMENTED);
+                let collection = this.onboarding[CONFIG.COLLECTION_REFERENCE[data.type]](),
                     callback = this.create[data.type].bind(this);
                 collection.splice(current_index, 1);
                 callback(item.element, data, current_index);

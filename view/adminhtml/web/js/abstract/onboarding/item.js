@@ -5,10 +5,8 @@
  */
 
 define([
-    'jquery',
-    'ko',
     'cssSelectorGenerator',
-], function ($, ko, selectorGen) {
+], function (selectorGen) {
     'use strict';
 
     let id = 1;

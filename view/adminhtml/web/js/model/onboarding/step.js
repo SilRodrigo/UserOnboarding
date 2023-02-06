@@ -9,9 +9,12 @@ define([
 ], function (OnboardingItem) {
     'use strict';
 
+    const TYPE = 'step'
+
     class Step extends OnboardingItem {
+
         constructor(data) {
-            super({...data, type : 'step'})
+            super({ ...data, type: TYPE })
         }
     }
 

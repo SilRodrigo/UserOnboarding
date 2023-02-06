@@ -6,7 +6,9 @@
 var config = {
     map: {
         '*': {
+            'Onboarding': 'Rsilva_UserOnboarding/js/model/onboarding',
             'OnboardingStep': 'Rsilva_UserOnboarding/js/model/onboarding/step',
+            'OnboardingLibHandler': 'Rsilva_UserOnboarding/js/model/onboarding/lib-handler',
         }
     }
 };
