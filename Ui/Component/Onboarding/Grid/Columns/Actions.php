@@ -2,8 +2,8 @@
 
 /**
  * @author Rodrigo Silva
- * @copyright Copyright (c) 2022 Rodrigo Silva (https://github.com/SilRodrigo)
- * @package Rsilva_Vitrine
+ * @copyright Copyright (c) 2023 Rodrigo Silva (https://github.com/SilRodrigo)
+ * @package Rsilva_UserOnboarding
  */
 
 namespace Rsilva\UserOnboarding\Ui\Component\Onboarding\Grid\Columns;

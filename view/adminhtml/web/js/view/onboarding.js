@@ -207,7 +207,7 @@ define([
             this.button.reproduce.enable(!this.button.reproduce.enable());
             this.button.close.enable(!this.button.close.enable());
             this.status.is_inspecting(!this.status.is_inspecting());
-            this.button.inspect.label(this.status.is_inspecting() ? 'Inspecting' : 'Inspect');
+            this.button.inspect.label(this.status.is_inspecting() ? $.mage.__('Inspecting') : $.mage.__('Inspect'));
             this.highlight.toggle();
         },
 
@@ -220,7 +220,7 @@ define([
             this.button.close.enable(!this.button.close.enable());
             this.button.close.visible(!this.button.close.visible());
             this.status.is_reproducing(!this.status.is_reproducing());
-            this.button.reproduce.label(this.status.is_reproducing() ? 'Exit Preview' : 'Preview');
+            this.button.reproduce.label(this.status.is_reproducing() ? $.mage.__('Exit Preview') : $.mage.__('Preview'));
             if (this.status.is_reproducing()) {
                 this.lib.start(this.onboarding, this.iframe.scope.contentDocument, this.iframe.scope.contentWindow);
             }
