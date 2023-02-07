@@ -145,7 +145,9 @@ define([
         }
 
         unlinkHtml() {
-            this.#item.remove();
+            try {
+                this.#item.remove();
+            } catch (error) { }
         }
 
         getSerializedData() {

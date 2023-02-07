@@ -12,32 +12,64 @@ define([
     'Onboarding',
     'OnboardingStep',
     'OnboardingLibHandler',
+    'OnboardingIframe',
     './onboarding/modal',
     '../config/onboarding',
     'highlight',
     'introJs',
-], function ($, ko, alertWidget, Abstract, Onboarding, Step, LibHandler, modal, config, highlight, introJs) {
+], function (
+    $,
+    ko,
+    alertWidget,
+    Abstract,
+    Onboarding,
+    Step,
+    LibHandler,
+    Iframe,
+    modal,
+    config,
+    highlight,
+    introJs
+) {
     'use strict';
 
     const CONFIG = { ...config };
-
     const DEFAULT_MODE = CONFIG.CREATION_MODE.STEP;
     const CURRENT_LIB = CONFIG.LIB.INTROJS;
 
     return Abstract.extend({
 
         /**
+         * @type {Onboarding}
+         */
+        onboarding: new Onboarding(),
+
+        /**
+         * @type {LibHandler}
+         */
+        lib: new LibHandler(CURRENT_LIB, introJs),
+
+        /**
+         * @type {Iframe}
+         */
+        iframe: new Iframe(ko.observable(''), CONFIG.IFRAME.WIDTH, CONFIG.IFRAME.HEIGHT),
+
+        /**
+         * @type {highlight}
+         */
+        highlight: null,
+
+        /**
+         * @type {modal}
+         */
+        modal: null,
+
+        /**
+         * Base view model properties and functions
          * @var {Object} defaults
          */
         defaults: {
-            onboarding: new Onboarding(),
-            lib: new LibHandler(CURRENT_LIB, introJs),
-            iframe: {
-                url: ko.observable(''),
-                width: CONFIG.IFRAME.WIDTH,
-                height: CONFIG.IFRAME.HEIGHT,
-                scope: null
-            },
+            creation_mode: ko.observable(DEFAULT_MODE),
             create: {
                 step(element, data, index) {
                     let step = new Step({ ...data, element: element });
@@ -71,11 +103,11 @@ define([
                 is_reproducing: ko.observable(false),
                 is_inspecting: ko.observable(false)
             },
-            highlight: null,
-            modal: null,
-            creation_mode: ko.observable(DEFAULT_MODE),
         },
 
+        /**
+         * Checks if onboarding already has data stored and if so populates the view
+         */
         loadData() {
             if (!this.value()) return;
             this.onboarding.clear();
@@ -129,6 +161,7 @@ define([
         },
 
         /**
+         * Sets onboarding scope based on HTMLIFrameElement passed
          * @param {HTMLIFrameElement} scope 
          */
         setIframeScope(scope) {
@@ -139,13 +172,17 @@ define([
                     actions = {
                         click: e => { this.newItem(e) }
                     };
-                scopeWindow.introJs = introJs;
                 this.highlight = highlight(currentBody, scopeWindow, actions);
                 this.loadData();
                 this.stopLoading();
             })
         },
 
+        /**
+         * Link a HTMLInputElement to observe any alteration on onboarding data
+         * and later be processed to be saved on DB
+         * @param {HTMLInputElement} element 
+         */
         registerOnboardingField(element) {
             this.onboarding.data.subscribe(value => {
                 $(element).val(value).change();
@@ -185,7 +222,7 @@ define([
             this.status.is_reproducing(!this.status.is_reproducing());
             this.button.reproduce.label(this.status.is_reproducing() ? 'Exit Preview' : 'Preview');
             if (this.status.is_reproducing()) {
-                this.lib.start(this.onboarding, this.iframe.scope.contentDocument);
+                this.lib.start(this.onboarding, this.iframe.scope.contentDocument, this.iframe.scope.contentWindow);
             }
         },
 
@@ -197,7 +234,10 @@ define([
             this.status.is_locked(status);
         },
 
+        // View events
+
         /**
+         * Evokes modal for creating/editing an Item
          * @param {Function} callback
          */
         callModal(callback, content) {
@@ -218,13 +258,12 @@ define([
             this.visible(true);
         },
 
-        // Creation events
-
         /**
          * Pops up current iframe for editing
          */
         startOnboardingCreation() {
             this.iframe.scope.parentElement.classList.add('creating');
+            document.body.classList.add('overflow-hidden');
         },
 
         /**
@@ -232,9 +271,16 @@ define([
          */
         closeOnboardingCreation() {
             this.iframe.scope.parentElement.classList.remove('creating');
+            document.body.classList.remove('overflow-hidden');
             this.save();
         },
 
+        // Data handling
+
+        /**
+         * Returns a JSON with stringfied data from onboarding collections
+         * @returns {JSON}
+         */
         serializeData() {
             let steps = [];
             this.onboarding.steps().forEach((step, i) => {
@@ -248,6 +294,10 @@ define([
             });
         },
 
+        /**
+         * Adds a Item to it's respective collection
+         * @param {HTMLElement} target_element 
+         */
         newItem(target_element) {
             this.callModal(data => {
                 try {
@@ -260,6 +310,11 @@ define([
             }, { type: DEFAULT_MODE });
         },
 
+        /**
+         * Changes data from an onboarding Item
+         * @param {Item} item 
+         * @param {number} current_index 
+         */
         editItem(item, current_index) {
             this.callModal(data => {
                 if (item.type !== data.type) return alert(CONFIG.MESSAGE.NOT_IMPLEMENTED);
@@ -270,6 +325,11 @@ define([
             }, item.getSerializedData())
         },
 
+        /**
+         * Deletes a item from onboarding collection
+         * @param {Item} item 
+         * @param {number} current_index 
+         */
         deleteItem(item, current_index) {
             const self = this;
             alertWidget({
@@ -294,6 +354,9 @@ define([
             });
         },
 
+        /**
+         * Saves current onboarding data
+         */
         save() {
             let serialized_data = this.serializeData(),
                 data_lib = this.lib.getData(this.onboarding, this.iframe.scope.contentDocument, true)
@@ -306,21 +369,6 @@ define([
             this.onboarding.data_lib(data_lib);
             this.onboarding.data(serialized_data);
         },
-
-        // Validations
-
-        /**
-         * @param {string} creation_mode 
-         * @returns boolean
-         */
-        isValidCreationMode(creation_mode) {
-            let is_valid = !!this.getCreationModeList().find(valid_mode => valid_mode === creation_mode);
-            return is_valid;
-        },
-
-        // Lib IntroJs
-
-
 
     });
 

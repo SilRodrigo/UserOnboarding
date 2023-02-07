@@ -31,6 +31,7 @@ define([
         delete(item, index) {
             let collection = this[CONFIG.COLLECTION_REFERENCE[item.type]]();
             collection.splice(index, 1);
+            this[CONFIG.COLLECTION_REFERENCE[item.type]](collection);
             item.unlinkHtml();
         }
 
