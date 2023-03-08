@@ -29,7 +29,7 @@ define([
     modal,
     config,
     highlight,
-    introJs
+    currentLib
 ) {
     'use strict';
 
@@ -47,7 +47,7 @@ define([
         /**
          * @type {LibHandler}
          */
-        lib: new LibHandler(CURRENT_LIB, introJs),
+        lib: new LibHandler(CURRENT_LIB, currentLib),
 
         /**
          * @type {Iframe}
