@@ -6,11 +6,19 @@
 
 define([
     '../lib/intro',
-    './abstract/onboarding-lib-handler'
-], function (introJs, LibHandler) {
+    './abstract/onboarding-lib-handler',
+    'ko'
+], function (introJs, LibHandler, ko) {
     'use strict';
 
     class IntroJs extends LibHandler {
+
+        #onexit(callback) {
+            this.active(false);
+            if (callback) callback();
+        }
+
+        active = ko.observable(false);
 
         /**
          * @param {Item} step 
@@ -42,12 +50,15 @@ define([
         start(onboarding, callback) {
             let options = this.prepareData(onboarding.getData());
             let introJs = this.render().setOptions(options);
-            if (callback) introJs.onexit(callback);
+            introJs.onexit(() => this.#onexit(callback));
             introJs.setOptions(options).start();
         }
 
         render() {
-            return introJs();
+            let rendered = introJs();
+            this.active(true);
+            rendered.onexit(() => this.#onexit());
+            return rendered;
         }
     }
 

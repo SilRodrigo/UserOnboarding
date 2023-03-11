@@ -22,13 +22,12 @@ define([], function () {
         let path = [],
             parent;
         while (parent = el.parentNode) {
+            if (parent.tagName === 'BODY' && el.className.includes('page-wrapper')) break;
             let tag = el.tagName,
                 selector;
 
             if (el.id) {
                 selector = `#${el.id}`;
-            } else if (el.className) {
-                selector = getClassName(el)
             } else {
                 let siblings = parent.children;
                 selector = [].filter.call(siblings, sibling => sibling.tagName === tag).length === 1 ? tag :

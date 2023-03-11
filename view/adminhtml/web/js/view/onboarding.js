@@ -213,10 +213,13 @@ define([
             this.status.is_reproducing(!this.status.is_reproducing());
             this.button.reproduce.label(this.status.is_reproducing() ? $.mage.__('Exit Preview') : $.mage.__('Preview'));
             if (this.status.is_reproducing()) {
+                let current_lib = this.iframe.scope.contentWindow[CURRENT_LIB];
                 this.button.reproduce.enable(false);
-                this.iframe.scope.contentWindow[CURRENT_LIB].start(this.onboarding, () => {
-                    this.button.reproduce.enable(true);
-                });
+                if (current_lib && !current_lib.active()) {
+                    this.iframe.scope.contentWindow[CURRENT_LIB].start(this.onboarding, () => {
+                        this.button.reproduce.enable(true);
+                    });
+                }
             }
         },
 
@@ -257,6 +260,13 @@ define([
          */
         startOnboardingCreation() {
             this.iframe.scope.parentElement.classList.add('creating');
+            let current_lib = this.iframe.scope.contentWindow[CURRENT_LIB];
+            if (current_lib && current_lib.active()) {
+                this.toggleReproduceOnboarding();
+                current_lib.active.subscribe((value) => {
+                    if (!value) this.button.reproduce.enable(true);
+                })
+            }
             document.body.classList.add('overflow-hidden');
         },
 
