@@ -54,7 +54,7 @@
             </div>
             <div class="list-container" data-bind="visible: !status.is_reproducing()">
                 <div class="steps-list onboarding-menu bmarg-10">
-                    <div class="header-list d-flex justify-content-between pad-10 bold">
+                    <div class="header-list d-flex justify-content-between pad-10 bold overflow-hidden">
                         <div>
                             <span data-bind="i18n: 'Steps'"></span>
                         </div>
@@ -79,7 +79,7 @@
                         </div>
                         <!-- /ko -->
                         <!--/ko-->
-                        <div class="item d-flex justify-content-between pad-10"
+                        <div class="item d-flex justify-content-between pad-10 overflow-hidden"
                              data-bind="click: function() { newItem() }">
                             <div class="rpad-10">
                                 <span class="box-clamp-1" data-bind="i18n: 'Add new step'"></span>
