@@ -11,12 +11,10 @@ define([
     'Magento_Ui/js/form/element/abstract',
     'Onboarding',
     'OnboardingStep',
-    'OnboardingLibHandler',
     'OnboardingIframe',
     './onboarding/modal',
     '../config/onboarding',
     'highlight',
-    'introJs',
 ], function (
     $,
     ko,
@@ -24,12 +22,10 @@ define([
     Abstract,
     Onboarding,
     Step,
-    LibHandler,
     Iframe,
     modal,
     config,
     highlight,
-    currentLib
 ) {
     'use strict';
 
@@ -43,11 +39,6 @@ define([
          * @type {Onboarding}
          */
         onboarding: new Onboarding(),
-
-        /**
-         * @type {LibHandler}
-         */
-        lib: new LibHandler(CURRENT_LIB, currentLib),
 
         /**
          * @type {Iframe}
@@ -222,7 +213,10 @@ define([
             this.status.is_reproducing(!this.status.is_reproducing());
             this.button.reproduce.label(this.status.is_reproducing() ? $.mage.__('Exit Preview') : $.mage.__('Preview'));
             if (this.status.is_reproducing()) {
-                this.lib.start(this.onboarding, this.iframe.scope.contentDocument, this.iframe.scope.contentWindow);
+                this.button.reproduce.enable(false);
+                this.iframe.scope.contentWindow[CURRENT_LIB].start(this.onboarding, () => {
+                    this.button.reproduce.enable(true);
+                });
             }
         },
 
@@ -282,16 +276,18 @@ define([
          * @returns {JSON}
          */
         serializeData() {
-            let steps = [];
-            this.onboarding.steps().forEach((step, i) => {
-                let serialized_data = step.getSerializedData();
-                serialized_data.index = i;
-                steps.push(serialized_data);
-            })
-
-            return JSON.stringify({
-                steps: steps,
-            });
+            let data = this.onboarding.getData();
+            let serialized_data = {};
+            for (const key in data) {
+                const element = data[key];
+                if (!serialized_data[key]) serialized_data[key] = [];
+                element.forEach((item, i) => {
+                    let item_serialized_data = item.getSerializedData();
+                    item_serialized_data.index = i;
+                    serialized_data[key].push(item_serialized_data);
+                })
+            }
+            return JSON.stringify(serialized_data);
         },
 
         /**
@@ -359,7 +355,7 @@ define([
          */
         save() {
             let serialized_data = this.serializeData(),
-                data_lib = this.lib.getData(this.onboarding, this.iframe.scope.contentDocument, true)
+                data_lib = this.iframe.scope.contentWindow[CURRENT_LIB].prepareData(this.onboarding.getData(), true);
             try {
                 JSON.parse(serialized_data);
                 data_lib = JSON.stringify(data_lib);

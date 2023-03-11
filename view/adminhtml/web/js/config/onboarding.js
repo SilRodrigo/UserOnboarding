@@ -5,7 +5,7 @@
  */
 
 define([
-    'jquery'
+    'jquery',
 ], function ($) {
     'use strict';
 
@@ -21,7 +21,7 @@ define([
             step: 'steps',
         },
         LIB: {
-            INTROJS: 'introjs'
+            INTROJS: 'introJs'
         },
         MESSAGE: {
             NOT_IMPLEMENTED: $.mage.__('This function is not implemented yet'),

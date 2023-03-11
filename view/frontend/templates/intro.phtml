@@ -1,27 +1,31 @@
 <?php
+
 /**
-  * @author Rodrigo Silva
+ * @author Rodrigo Silva
  * @copyright Copyright (c) 2023 Rodrigo Silva (https://github.com/SilRodrigo)
  * @package Rsilva_UserOnboarding
  */
 /** @var \Rsilva\UserOnboarding\Block\Onboarding  $block */
 ?>
 
-<?php if ($onboarding = $block->get()) : ?>
-    <div class="introJs" data-bind="scope: 'loadIntro'"></div>
+<?php
+$onboarding = $block->get();
+$options = json_encode(null);
+if ($onboarding) $options = $onboarding->toJson();
+?>
+<div class="introJs" data-bind="scope: 'loadIntro'"></div>
 
-    <script type="text/x-magento-init">
-        {
+<script type="text/x-magento-init">
+    {
          "*": {
             "Magento_Ui/js/core/app": {
                 "components": {
                     "loadIntro": {
                         "component": "Rsilva_UserOnboarding/js/loadIntro",
-                        "onboarding": <?= $onboarding->toJson() ?>
+                        "onboarding": <?= $options ?>
                     }
                 }
             }
         }
     }
-    </script>
-<?php endif; ?>
+</script>

@@ -21,8 +21,9 @@ define([
 
         loadIntro: function () {
             try {
+                if (!this.config?.onboarding?.data_lib) return;
                 const options = JSON.parse(this.config.onboarding.data_lib);
-                introJs().setOptions(options).start();
+                introJs.render().setOptions(options).start();
             } catch (error) {
                 console.warn(error);
             }

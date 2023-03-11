@@ -35,6 +35,12 @@ define([
             item.unlinkHtml();
         }
 
+        getData() {
+            return {
+                steps: this.steps(),
+            }
+        }
+
         clear() {
             this.steps([]);
             this.hints([]);
