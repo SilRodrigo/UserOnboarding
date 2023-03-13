@@ -1,35 +1,31 @@
 <?php
 
-namespace Rsilva\UserOnboarding\Block;
+namespace Rsilva\UserOnboarding\ViewModel;
 
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\Search\FilterGroupBuilder;
 use Magento\Framework\Api\Search\SearchCriteriaBuilder;
 use Magento\Framework\Api\SortOrderBuilder;
-use Magento\Framework\View\Element\Template;
+use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Framework\UrlInterface;
 use Rsilva\UserOnboarding\Api\Data\OnboardingInterface;
 use Rsilva\UserOnboarding\Api\OnboardingRepositoryInterface;
 
-class Onboarding extends Template
+class Onboarding implements ArgumentInterface
 {
 
     public function __construct(
-        Template\Context $context,
         protected OnboardingRepositoryInterface $onboardingRepository,
         protected SearchCriteriaBuilder $searchCriteriaBuilder,
         protected FilterGroupBuilder $filterGroupBuilder,
         protected FilterBuilder $filterBuilder,
         protected SortOrderBuilder $sortOrderBuilder,
         protected UrlInterface $url,
-        array $data = []
     ) {
-        parent::__construct($context, $data);
     }
 
     public function get()
     {
-        $onboarding = false;
         $routeParams = ['_use_rewrite' => true, '_forced_secure' => true];
         $currentUrl = $this->url->getUrl('*/*/*', $routeParams);
 
@@ -57,15 +53,15 @@ class Onboarding extends Template
 
         $searchCriteria = $this->searchCriteriaBuilder->create()
             ->setFilterGroups($filterGroups)
-            ->setSortOrders([$sortOrder])
-            ->setPageSize(1);
+            ->setSortOrders([$sortOrder]);
 
-        $onboardings = $this->onboardingRepository->getList($searchCriteria);
+        $list = $this->onboardingRepository->getList($searchCriteria);
 
-        if ($onboardings->getTotalCount()) {
-            $onboarding = current($onboardings->getItems());
+        $options = [];
+        foreach ($list->getItems() as $item) {
+            $options[] = $item->toJson();
         }
 
-        return $onboarding;
+        return json_encode($options);
     }
 }

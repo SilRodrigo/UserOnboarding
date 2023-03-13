@@ -9,9 +9,11 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="before.body.end">
-            <block class="Rsilva\UserOnboarding\Block\Onboarding"
-                   name="user.onboarding"
-                   template="Rsilva_UserOnboarding::intro.phtml" />
+            <block name="user.onboarding" template="Rsilva_UserOnboarding::intro.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Rsilva\UserOnboarding\ViewModel\Onboarding</argument>
+                </arguments>
+            </block>
         </referenceContainer>
     </body>
 </page>
