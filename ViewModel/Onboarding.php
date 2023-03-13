@@ -48,7 +48,7 @@ class Onboarding implements ArgumentInterface
 
         $sortOrder = $this->sortOrderBuilder
             ->setField(OnboardingInterface::ONBOARDING_ID)
-            ->setDirection(OnboardingRepositoryInterface::SORT_DESC)
+            ->setDirection(OnboardingRepositoryInterface::SORT_ASC)
             ->create();
 
         $searchCriteria = $this->searchCriteriaBuilder->create()

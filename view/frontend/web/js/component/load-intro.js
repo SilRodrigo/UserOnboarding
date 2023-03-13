@@ -43,7 +43,7 @@ define([
         load(onboarding, onboardings) {
             const options = JSON.parse(onboarding.data_lib);
             let intro = introJs.render().setOptions(options);
-            if (onboardings[0]) intro.onexit(this.render(onboardings));
+            if (onboardings[0]) intro.onexit(() => { this.render(onboardings) });
             intro.start();
         }
     })
