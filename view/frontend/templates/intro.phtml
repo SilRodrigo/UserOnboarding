@@ -5,13 +5,11 @@
  * @copyright Copyright (c) 2023 Rodrigo Silva (https://github.com/SilRodrigo)
  * @package Rsilva_UserOnboarding
  */
-/** @var \Rsilva\UserOnboarding\Block\Onboarding  $block */
+/** @var \Rsilva\UserOnboarding\ViewModel\Onboarding $viewModel */
 ?>
 
 <?php
-$onboarding = $block->get();
-$options = json_encode(null);
-if ($onboarding) $options = $onboarding->toJson();
+$viewModel = $block->getViewModel();
 ?>
 <div class="introJs" data-bind="scope: 'loadIntro'"></div>
 
@@ -21,8 +19,8 @@ if ($onboarding) $options = $onboarding->toJson();
             "Magento_Ui/js/core/app": {
                 "components": {
                     "loadIntro": {
-                        "component": "Rsilva_UserOnboarding/js/loadIntro",
-                        "onboarding": <?= $options ?>
+                        "component": "Rsilva_UserOnboarding/js/component/load-intro",
+                        "onboardings": <?= $viewModel->get() ?>
                     }
                 }
             }
