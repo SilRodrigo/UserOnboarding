@@ -1,3 +1,4 @@
+
 # UserOnboarding Module for Magento 2
 
 [![Latest Stable Version](https://img.shields.io/packagist/v/rsilva/user-onboarding.svg?style=flat-square)](https://packagist.org/packages/opengento/module-document)
@@ -6,15 +7,17 @@
 [![Packagist](https://img.shields.io/packagist/dm/rsilva/user-onboarding.svg?style=flat-square)](https://packagist.org/packages/rsilva/useronboarding/stats)
 
 This module allows you to create onboarding for any frontend part of your website.
-Check https://introjs.com/ for reference.
+
+![Registration process](https://github.com/SilRodrigo/UserOnboarding/blob/master/view/adminhtml/web/images/backend.gif?raw=true)
+
+![Frontend presentation](https://github.com/SilRodrigo/UserOnboarding/blob/master/view/adminhtml/web/images/frontend.gif?raw=true)
 
  - [Setup](#setup)
    - [Composer installation](#composer-installation)
    - [Setup the module](#setup-the-module)
- - [Features](#features)
- - [Using](#using)
+ - [Features](#features) 
  - [Support](#support)
- - [Authors](#authors)
+ - [Author](#author)
  - [License](#license)
 
 ## Setup
