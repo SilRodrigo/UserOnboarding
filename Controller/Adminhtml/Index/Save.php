@@ -13,6 +13,7 @@ use Rsilva\UserOnboarding\Model\Onboarding;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\ObjectManager;
+use Magento\Framework\App\Cache\TypeListInterface as CacheTypeListInterface;
 
 /**
  * Class Save for save checkout fields
@@ -20,6 +21,11 @@ use Magento\Framework\App\ObjectManager;
 class Save extends Action
 {
     public const SAVE_ERROR = "Error on saving entity";
+
+    /**
+     * @var CacheTypeListInterface
+     */
+    private $cache;
 
     /**
      * @var OnboardingFactory
@@ -33,8 +39,10 @@ class Save extends Action
 
     public function __construct(
         Context $context,
+        CacheTypeListInterface $cache,
         OnboardingFactory $onboardingFactory = null
     ) {
+        $this->cache = $cache;
         $this->onboardingFactory = $onboardingFactory ?: ObjectManager::getInstance()->get(OnboardingFactory::class);
         parent::__construct($context);
     }
@@ -53,6 +61,9 @@ class Save extends Action
                 $this->messageManager->addErrorMessage($e->getMessage());
             }
         }
+
+        $this->cache->invalidate('full_page');
+
         return $this->resultRedirectFactory->create()
             ->setPath('*/*', ['_current' => true]);
     }
