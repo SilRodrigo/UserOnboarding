@@ -4,6 +4,14 @@ define([
 ], function ($, introJs) {
     'use strict';
 
+    const INTRO_TEXT_LIST = [
+        $.mage.__('Hi, lets start a quick tour on User Onboarding!'),
+        $.mage.__("This option enables or disables this onboarding for frontend users."),
+        $.mage.__("Set a name for your onboarding for later reference."),
+        $.mage.__("Input an Url from your website to start creating an onboarding."),
+        $.mage.__("After you informed a valid Url, you'll be able to access it and start creating your onboarding.")
+    ];
+
     return function (config, element) {
         $(element).on('click', () => {
             let intro = introJs.render().setOptions({
@@ -11,34 +19,36 @@ define([
                 tooltipClass: 'quick-tour',
                 steps: [{
                     title: $.mage.__('Quick tour'),
-                    intro: $.mage.__('Hi, let\'s start a quick tour on User Onboarding')
+                    intro: INTRO_TEXT_LIST[0]
                 },
                 {
                     element: document.querySelector('.admin__field:nth-of-type(2)'),
                     title: $.mage.__('Enable'),
-                    intro: $.mage.__('This option enables or disables this onboarding for frontend users.'),
+                    intro: INTRO_TEXT_LIST[1],
                     position: 'top',
                 },
                 {
                     element: document.querySelector('.admin__field:nth-of-type(4)'),
                     title: $.mage.__('Name'),
-                    intro: $.mage.__('Set a name for your onboarding for later reference.'),
+                    intro: INTRO_TEXT_LIST[2],
                     position: 'top',
                 },
                 {
                     element: document.querySelector('.admin__field:nth-of-type(5)'),
                     title: $.mage.__('Page Url'),
-                    intro: $.mage.__('Input an Url from your website to start creating it\'s onboarding.'),
-                    position: 'top',
+                    intro: `
+                    <div class="onboarding_tour_step">
+                        <p>${INTRO_TEXT_LIST[3]}</p>
+                        <img src="${require.toUrl('Rsilva_UserOnboarding/images/onboarding-tuto-1.gif')}">
+                    </div>`
                 },
                 {
                     title: $.mage.__('Onboarding'),
-                    intro: $.mage.__(`<div id="onboarding_tour_step">
-                        <p>After you informed a valid Url, you'll be able to access it's page
-                        and start creating your onboarding.</p>
-                        <img src="${require.toUrl('Rsilva_UserOnboarding/images/onboarding-tuto-1.gif')}">
-                    </div>`),
-                    position: 'top',
+                    intro: `
+                    <div class="onboarding_tour_step">
+                        <p>${INTRO_TEXT_LIST[4]}</p>
+                        <img src="${require.toUrl('Rsilva_UserOnboarding/images/onboarding-tuto-2.gif')}">
+                    </div>`
                 },
                 ]
             })
