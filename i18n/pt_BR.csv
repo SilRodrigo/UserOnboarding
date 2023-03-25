@@ -1,4 +1,5 @@
 "User Onboarding","Onboarding de Usuário",module,Rsilva_UserOnboarding
+"New Onboarding","Novo Onboarding",module,Rsilva_UserOnboarding
 "Create Onboarding","Criar Onboarding",module,Rsilva_UserOnboarding
 "Name","Nome",module,Rsilva_UserOnboarding
 "Action","Ações",module,Rsilva_UserOnboarding
@@ -20,4 +21,13 @@
 "Steps","Etapas",module,Rsilva_UserOnboarding
 "This is a preview of your Onboarding","Este é um preview do seu Onboarding",module,Rsilva_UserOnboarding
 "Exit Preview","Sair da Visualização",module,Rsilva_UserOnboarding
-"Add new step","Adicionar nova etapa",module,Rsilva_UserOnboarding
+"Entire screen step","Etapa para página inteira",module,Rsilva_UserOnboarding
+"Quick tour","Tour rápido",module,Rsilva_UserOnboarding
+"Are you sure you want to delete this %1?","Tem certeza que quer deletar essa %1?",module,Rsilva_UserOnboarding
+"Cancel","Cancelar",module,Rsilva_UserOnboarding
+"step","etapa",module,Rsilva_UserOnboarding
+"Hi, lets start a quick tour on User Onboarding!","Olá, vamos fazer um tour rápido pelo User Onboarding!",module,Rsilva_UserOnboarding
+"This option enables or disables this onboarding for frontend users.","Esta opção ativa/desativa a visualização do onboarding para os usuários no frontend",module,Rsilva_UserOnboarding
+"Set a name for your onboarding for later reference.","Coloque um nome no seu onboarding para se basear posteriormente",module,Rsilva_UserOnboarding
+"Input an Url from your website to start creating an onboarding.","Informe uma url do seu site para começar a criar o onboarding",module,Rsilva_UserOnboarding
+"After you informed a valid Url, you'll be able to access it and start creating your onboarding.","Depois que você informar uma Url válida, você conseguirá acessa-la e começar a criar o onboarding.",module,Rsilva_UserOnboarding

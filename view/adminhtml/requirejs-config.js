@@ -9,6 +9,7 @@ var config = {
             'Onboarding': 'Rsilva_UserOnboarding/js/model/onboarding',
             'OnboardingStep': 'Rsilva_UserOnboarding/js/model/onboarding/step',
             'OnboardingIframe': 'Rsilva_UserOnboarding/js/model/onboarding/iframe',
+            'tutorialInputTour': 'Rsilva_UserOnboarding/js/tutorial/tour',
         }
     }
 };

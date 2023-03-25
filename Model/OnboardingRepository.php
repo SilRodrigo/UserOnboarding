@@ -65,7 +65,7 @@ class OnboardingRepository implements OnboardingRepositoryInterface
         $collection = $this->onboardingCollectionFactory->create();
         foreach ($searchCriteria->getFilterGroups() as $filterGroup) {
             foreach ($filterGroup->getFilters() as $filter) {
-                $condition = $filter->getConditionType() ?: 'eq';
+                $condition = $filter->getConditionType() ?: OnboardingRepositoryInterface::EQ;
                 $collection->addFieldToFilter($filter->getField(), [$condition => $filter->getValue()]);
             }
         }
@@ -75,7 +75,7 @@ class OnboardingRepository implements OnboardingRepositoryInterface
             foreach ($sortOrdersData as $sortOrder) {
                 $collection->addOrder(
                     $sortOrder->getField(),
-                    ($sortOrder->getDirection() == SortOrder::SORT_ASC) ? 'ASC' : 'DESC'
+                    ($sortOrder->getDirection() == SortOrder::SORT_ASC) ? SortOrder::SORT_ASC : SortOrder::SORT_DESC
                 );
             }
         }

@@ -100,7 +100,6 @@
             <dataScope>page_url</dataScope>
             <validation>
                <rule name="required-entry" xsi:type="boolean">true</rule>
-               <!-- <rule name="validate-url" xsi:type="boolean">true</rule> -->
             </validation>
          </settings>
       </field>
@@ -117,9 +116,6 @@
             <dataType>text</dataType>
             <label translate="true">Onboarding</label>
             <dataScope>onboarding</dataScope>
-            <!-- <validation>
-               <rule name="required-entry" xsi:type="boolean">true</rule>
-            </validation> -->
          </settings>
       </field>
       <field formElement="input" name="data_lib" sortOrder="20">

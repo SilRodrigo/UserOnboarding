@@ -212,7 +212,7 @@ define([
             this.button.close.visible(!this.button.close.visible());
             this.status.is_reproducing(!this.status.is_reproducing());
             this.button.reproduce.label(this.status.is_reproducing() ? $.mage.__('Exit Preview') : $.mage.__('Preview'));
-            if (this.status.is_reproducing()) {
+            if (this.status.is_reproducing() && this.onboarding.steps().length) {
                 let current_lib = this.iframe.scope.contentWindow[CURRENT_LIB];
                 this.button.reproduce.enable(false);
                 if (current_lib && !current_lib.active()) {
