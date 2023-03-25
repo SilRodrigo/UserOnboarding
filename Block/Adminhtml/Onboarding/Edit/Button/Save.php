@@ -14,7 +14,6 @@ use Magento\Ui\Component\Control\Container;
 /**
  * Class SaveButton
  *
- * @package SyncIt\Brand\Block\Adminhtml\Brand\Edit
  */
 class Save extends Generic implements ButtonProviderInterface
 {

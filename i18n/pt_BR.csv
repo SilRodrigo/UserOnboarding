@@ -1,4 +1,5 @@
 "User Onboarding","Onboarding de Usuário",module,Rsilva_UserOnboarding
+"New Onboarding","Novo Onboarding",module,Rsilva_UserOnboarding
 "Create Onboarding","Criar Onboarding",module,Rsilva_UserOnboarding
 "Name","Nome",module,Rsilva_UserOnboarding
 "Action","Ações",module,Rsilva_UserOnboarding
@@ -20,4 +21,8 @@
 "Steps","Etapas",module,Rsilva_UserOnboarding
 "This is a preview of your Onboarding","Este é um preview do seu Onboarding",module,Rsilva_UserOnboarding
 "Exit Preview","Sair da Visualização",module,Rsilva_UserOnboarding
-"Add new step","Adicionar nova etapa",module,Rsilva_UserOnboarding
+"Entire screen step","Etapa para página inteira",module,Rsilva_UserOnboarding
+"Quick tour","Tour rápido",module,Rsilva_UserOnboarding
+"Are you sure you want to delete this %1?","Tem certeza que quer deletar essa %1?",module,Rsilva_UserOnboarding
+"Cancel","Cancelar",module,Rsilva_UserOnboarding
+"step","etapa",module,Rsilva_UserOnboarding
